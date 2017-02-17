@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project>
+	
+	<app
+		title="Rapella Fella"
+		file="RapellaFella"
+		main="com.geokureli.rapella.Main"
+		package="com.geokureli.rapella"
+		version="1.0.0"
+		company="GeoKureli"
+	/>
+	<app path="export/release" />
+	<app path="export" if="debug" />
+	
+	<classpath name="source" />
+	<classpath path="../lib/Hi-ReS-Stats/src" />
+	<classpath path="../lib/HxAssert/src" />
+	<!--<classpath path="../lib/HxBitmapAnim/src" />-->
+	
+	<window width="960" height="540" fps="30" background="#5c94fc" hardware="true" vsync="true" />
+	
+	<haxelib name="openfl" />
+	<haxelib name="swf" />
+	<haxelib name="signal" />
+	<haxelib name="actuate" />
+	<haxelib name="polygonal-printf" />
+	
+	<library path="Assets/swfs/TestScene.swf" id="library" type="swflite" preload="true" />
+	
+	<assets path="assets" exclude="openfl.svg|*.swf" />
+	<icon path="assets/openfl.svg" />
+	
+</project>
