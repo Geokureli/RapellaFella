@@ -5,6 +5,5 @@ package com.geokureli.rapella;
  * @author George
  */
 class ScriptInterpreter {
-	
-	
+    
 }

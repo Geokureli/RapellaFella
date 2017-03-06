@@ -10,25 +10,25 @@ import openfl.events.KeyboardEvent;
  * @author George
  */
 class DebugOverlay extends Sprite {
-
-	public function new() {
-		super();
-		
-		addChild(new DebugStats());
-		
-		addEventListener(Event.ADDED_TO_STAGE, init);
-	}
-	
-	function init(e:Event):Void {
-		
-		visible = false;
-		
-		Key.listen(Key.TILDE, handleKey);
-	}
-	
-	function handleKey(isDown:Bool):Void {
-		
-		if (isDown)
-			visible = !visible;
-	}
+    
+    public function new() {
+       super();
+        
+       addChild(new DebugStats());
+        
+        addEventListener(Event.ADDED_TO_STAGE, init);
+    }
+    
+    function init(e:Event):Void {
+        
+        visible = false;
+        
+        Key.listen(Key.TILDE, handleKey);
+    }
+    
+    function handleKey(isDown:Bool):Void {
+        
+        if (isDown)
+            visible = !visible;
+    }
 }
