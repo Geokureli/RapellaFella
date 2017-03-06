@@ -1,5 +1,6 @@
 package com.geokureli.rapella.camera;
 
+import flash.display.DisplayObject;
 import com.geokureli.rapella.utils.Game;
 import openfl.display.Sprite;
 import openfl.geom.Rectangle;
@@ -13,6 +14,8 @@ class Camera {
     
     public var drawTarget:Sprite;
     public var bounds(default, null):Rectangle;
+    public var followSpeed:Float;
+    public var followTarget:DisplayObject;
     
     public var x      (get, set):Float;
     public var y      (get, set):Float;
@@ -36,11 +39,28 @@ class Camera {
         
         _halfWidth  = _view.width  / 2;
         _halfHeight = _view.height / 2;
+        followSpeed = Math.NaN;
     }
     
     public function update():Void {
         if (drawTarget == null)
             return;
+        
+        if(followTarget != null) {
+    
+            var diff:Point = new Point(followTarget.x - centerX, followTarget.y - centerY);
+            
+            if(!Math.isNaN(followSpeed) && Math.isFinite(followSpeed)) {
+                
+                if      (diff.x >  followSpeed) diff.x =  followSpeed;
+                else if (diff.x < -followSpeed) diff.x = -followSpeed;
+                if      (diff.y >  followSpeed) diff.y =  followSpeed;
+                else if (diff.y < -followSpeed) diff.y = -followSpeed;
+            }
+            
+            _view.x += diff.x;
+            _view.y += diff.y;
+        }
         
         // --- KEEP CAMERA IN BOUNDS
         if      (left   < bounds.left  ) left   = bounds.left  ;
