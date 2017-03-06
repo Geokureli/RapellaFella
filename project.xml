@@ -10,8 +10,7 @@
         company="GeoKureli"
     />
     
-    <app path="export/release" />
-    <app path="export" if="debug" />
+    <app path="export"/>
     
     <classpath name="source" />
     <classpath path="../lib/Hi-ReS-Stats/src" />
@@ -26,7 +25,7 @@
     <haxelib name="actuate" />
     <haxelib name="polygonal-printf" />
     
-    <library path="Assets/swfs/TestScene.swf" id="library" type="swflite" preload="true" />
+    <library path="Assets/swfs/TestScene.swf" id="library1" type="swflite" preload="true" />
     
     <assets path="assets" exclude="openfl.svg|*.swf" />
     <icon path="assets/openfl.svg" />

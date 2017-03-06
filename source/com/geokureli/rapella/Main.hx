@@ -47,8 +47,8 @@ class Main extends Sprite {
         addChild(_debugLayer = new Sprite());
         _debugLayer.addChild(new DebugOverlay());
         
-        _sceneLayer.addChild(_currentScene = new SceneWrapper(Assets.getMovieClip("library:SceneTest")));
-        new InteractMenu(Assets.getMovieClip("library:InteractMenu"));
+        _sceneLayer.addChild(_currentScene = new SceneWrapper("library1:SceneTest"));
+        new InteractMenu(Assets.getMovieClip("library1:InteractMenu"));
         
         addEventListener(Event.ENTER_FRAME, onEnterFrame);
     }
@@ -76,7 +76,7 @@ class SceneWrapper extends Scene {
     /** Reusable point for shit */
     var _pt:Point;
     
-    public function new(target:Sprite) { super(target); }
+    public function new(symbolId:String) { super(Assets.getMovieClip(symbolId)); }
     
     override function initChildren() {
         super.initChildren();
