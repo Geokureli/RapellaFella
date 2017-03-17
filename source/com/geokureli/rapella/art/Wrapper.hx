@@ -38,6 +38,8 @@ class Wrapper extends Sprite {
             addChild(_target);
         }
         
+        initChildren();
+        
         if (target.stage == null)
            _target.addEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
         else
@@ -51,6 +53,8 @@ class Wrapper extends Sprite {
         _childWrappers = new Array<Wrapper>();
         _isParent = _target.parent == null;
     }
+    
+    function initChildren():Void { }
     
     function onAddedToStage(e:Event = null) {
         
@@ -66,22 +70,31 @@ class Wrapper extends Sprite {
         }
     }
     
-    public function add(child:Wrapper):Wrapper
-    {
+    public function add(child:Wrapper):Wrapper {
+        
         if (_childWrappers.indexOf(child) == -1)
            _childWrappers.push(child);
         
         return child;
     }
     
-    public function remove(child:Wrapper):Wrapper
-    {
+    public function remove(child:Wrapper):Wrapper {
+        
         _childWrappers.remove(child);
         
         return child;
     }
     
     function get__clip():MovieClip { return cast(_target, MovieClip); }
+    
+    public function destroy():Void {
+        
+        if(_target.parent == this)
+            removeChild(_target);
+        
+        _target = null;
+        _childWrappers = null;
+    }
     
     //@:getter(stage)
     //override function get_stage():Stage {

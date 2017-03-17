@@ -1,0 +1,35 @@
+{
+    "Scene1":{
+        "labels": {
+            "choice_1": {
+                "option1": [
+                    "goto(skip)"
+                ],
+                "option2": {
+                    "if": "vars.hasKey",
+                    "then": "gotoScene(Scene2)",
+                    "else": "goto(start)"
+                },
+                "option3": "gotoScene(Scene3)",
+                "option4": "gotoScene(Scene2)"
+            }
+        }
+    },
+    "Scene2":{
+        "labels":{
+            "choice_1":{
+    
+                "option1": [
+                    "vars.hasKey = true",
+                    "gotoScene(Scene1)"
+                ],
+                "option2": {
+                    "if": "vars.hasKey",
+                    "then": "gotoScene(Scene2)",
+                    "else": "goto(start)"
+                },
+                "option3": "gotoScene(Scene3)"
+            }
+        }
+    }
+}

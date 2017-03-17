@@ -1,67 +1,13 @@
-package com.geokureli.rapella;
+package com.geokureli.rapella.art.scenes;
 
 import com.geokureli.rapella.art.HeroWrapper;
-import com.geokureli.rapella.art.Scene;
-import com.geokureli.rapella.art.ui.InteractMenu;
-import com.geokureli.rapella.camera.Camera;
-import com.geokureli.rapella.debug.DebugOverlay;
-import com.geokureli.rapella.input.Key;
-import com.geokureli.rapella.utils.Game;
 import com.geokureli.rapella.utils.SwfUtils;
-import motion.Actuate;
-import motion.easing.Linear;
-import openfl.Assets;
 import openfl.display.MovieClip;
 import openfl.display.Shape;
-import openfl.display.Sprite;
-import openfl.events.Event;
 import openfl.geom.Point;
 import openfl.geom.Rectangle;
 
-class Main extends Sprite {
-    
-    var _sceneLayer:Sprite;
-    var _debugLayer:Sprite;
-    var _currentScene:SceneWrapper;
-    
-    public function new () {
-        
-        super ();
-        
-        if (stage != null)
-            init();
-        else
-            addEventListener(Event.ADDED_TO_STAGE, init);
-    }
-    
-    function init(e:Event = null):Void {
-        removeEventListener(Event.ADDED_TO_STAGE, init);
-        
-        // entry point
-        Game.init(stage);
-        Key.init(stage);
-        Actuate.defaultEase = Linear.easeNone;
-        Game.camera = new Camera();
-        
-        addChild(_sceneLayer = new Sprite());
-        addChild(_debugLayer = new Sprite());
-        _debugLayer.addChild(new DebugOverlay());
-        
-        _sceneLayer.addChild(_currentScene = new SceneWrapper("library1:SceneTest"));
-        new InteractMenu(Assets.getMovieClip("library1:InteractMenu"));
-        
-        addEventListener(Event.ENTER_FRAME, onEnterFrame);
-    }
-    
-    function onEnterFrame(e:Event):Void {
-        
-        _currentScene.update();
-        
-        Game.camera.update();
-    }
-}
-
-class SceneWrapper extends Scene {
+class ActionScene extends Scene {
     
     static inline var RETICLE_MAX_DIS:Int = 100;
     static inline var CAMERA_DELAY:Int = 2;
@@ -76,7 +22,7 @@ class SceneWrapper extends Scene {
     /** Reusable point for shit */
     var _pt:Point;
     
-    public function new(symbolId:String) { super(Assets.getMovieClip(symbolId)); }
+    public function new(symbolId:String) { super(symbolId); }
     
     override function initChildren() {
         super.initChildren();
@@ -85,7 +31,7 @@ class SceneWrapper extends Scene {
         _pt = new Point();
         
         addChild(_reticle = new Reticle())
-            .visible = _showReticle;
+        .visible = _showReticle;
         
         var lights:Array<MovieClip> = SwfUtils.getAll(_target, 'light', new Array<MovieClip>());
         for (light in lights)
@@ -100,15 +46,15 @@ class SceneWrapper extends Scene {
     override function initCamera():Void {
         super.initCamera();
         
-            // --- FOLLOW ZONE CAN'T BE BIGGER THAN THE BOUNDS
+        // --- FOLLOW ZONE CAN'T BE BIGGER THAN THE BOUNDS
         if (FOLLOW_ZONE_SIZE.x == -1 || FOLLOW_ZONE_SIZE.x > _cameraBounds.width)
             FOLLOW_ZONE_SIZE.x = _cameraBounds.width;
         if (FOLLOW_ZONE_SIZE.y == -1 || FOLLOW_ZONE_SIZE.y > _cameraBounds.height)
             FOLLOW_ZONE_SIZE.y = _cameraBounds.height;
         
         _cameraFollowZone = new Rectangle(
-            (Game.stage.stageWidth  - FOLLOW_ZONE_SIZE.x) / 2,
-            (Game.stage.stageHeight - FOLLOW_ZONE_SIZE.y) / 2,
+            (Game.mainStage.stageWidth  - FOLLOW_ZONE_SIZE.x) / 2,
+            (Game.mainStage.stageHeight - FOLLOW_ZONE_SIZE.y) / 2,
             FOLLOW_ZONE_SIZE.x,
             FOLLOW_ZONE_SIZE.y
         );
@@ -117,7 +63,7 @@ class SceneWrapper extends Scene {
     override public function update():Void {
         super.update();
         
-        if (_cameraFollowZone != null) 
+        if (_cameraFollowZone != null)
             updateCamera();
     }
     

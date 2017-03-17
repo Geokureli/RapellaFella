@@ -1,3 +1,6 @@
 {
-	
+    "startingScene":"Scene1",
+    "scriptVars":{
+        "stat":"charisma"
+    }
 }

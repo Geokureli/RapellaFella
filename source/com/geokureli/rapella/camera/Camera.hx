@@ -1,7 +1,7 @@
 package com.geokureli.rapella.camera;
 
 import flash.display.DisplayObject;
-import com.geokureli.rapella.utils.Game;
+import com.geokureli.rapella.Game;
 import openfl.display.Sprite;
 import openfl.geom.Rectangle;
 import openfl.geom.Point;
@@ -35,7 +35,7 @@ class Camera {
     public function new() {
         
         bounds = new CameraBounds();
-        _view = new Rectangle(0, 0, Game.stage.stageWidth, Game.stage.stageHeight);
+        _view = new Rectangle(0, 0, Game.mainStage.stageWidth, Game.mainStage.stageHeight);
         
         _halfWidth  = _view.width  / 2;
         _halfHeight = _view.height / 2;
