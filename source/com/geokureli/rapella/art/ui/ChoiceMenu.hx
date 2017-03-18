@@ -1,5 +1,6 @@
 package com.geokureli.rapella.art.ui;
 
+import com.geokureli.rapella.utils.FuncUtils;
 import hx.debug.Assert;
 import openfl.events.MouseEvent;
 import com.geokureli.rapella.utils.SwfUtils;
@@ -27,6 +28,7 @@ class ChoiceMenu extends Wrapper {
     override function setDefaults() {
         super.setDefaults();
         
+        _scriptId = "choice";
         _isParent = false;
         onSelect = new Signal<String>();
     }
@@ -82,7 +84,7 @@ class ChoiceMenu extends Wrapper {
     override function onAddedToStage(e:Event = null) {
         super.onAddedToStage(e);
         
-        _target.addEventListener(Event.REMOVED, function (e:Event):Void { destroy(); } );
+        FuncUtils.addListenerOnce(_target, Event.REMOVED, function (e:Event):Void { destroy(); } );
         
         _target.alpha = 0;
         Actuate.tween(_target, .5, { alpha:1 } ).onComplete(handleShowComplete);
@@ -92,7 +94,7 @@ class ChoiceMenu extends Wrapper {
         
         for (option in _options) {
             
-            option.addEventListener(MouseEvent.CLICK     , handleClick.bind(_, option.name));
+            option.addEventListener(MouseEvent.CLICK     , handleClick);
             option.addEventListener(MouseEvent.MOUSE_OVER, handleMouseRoll);
             option.addEventListener(MouseEvent.MOUSE_OUT , handleMouseRoll);
         }
@@ -103,12 +105,20 @@ class ChoiceMenu extends Wrapper {
         e.currentTarget.alpha = e.type == MouseEvent.MOUSE_OVER ? 1 : 0;
     }
     
-    function handleClick(e:Event, optionKey:String):Void {
+    function handleClick(e:Event):Void {
         
-        onSelect.dispatch(optionKey);
+        for (option in _options) {
+            
+            option.removeEventListener(MouseEvent.CLICK     , handleClick);
+            option.removeEventListener(MouseEvent.MOUSE_OVER, handleMouseRoll);
+            option.removeEventListener(MouseEvent.MOUSE_OUT , handleMouseRoll);
+        }
+        
+        onSelect.dispatch(e.currentTarget.name);
     }
     
     override public function destroy():Void {
+        super.destroy();
         
         onSelect.dispose();
         

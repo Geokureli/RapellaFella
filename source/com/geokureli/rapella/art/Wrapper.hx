@@ -1,6 +1,9 @@
 package com.geokureli.rapella.art;
+import hx.debug.Assert;
+import haxe.Constraints.Function;
+import com.geokureli.rapella.ScriptInterpreter.IScriptInterpretable;
+import com.geokureli.rapella.ScriptInterpreter.Action;
 import openfl.events.Event;
-import openfl.display.Stage;
 import openfl.display.Sprite;
 import openfl.display.MovieClip;
 
@@ -8,7 +11,8 @@ import openfl.display.MovieClip;
  * ...
  * @author George
  */
-class Wrapper extends Sprite {
+class Wrapper extends Sprite
+    implements IScriptInterpretable{
     
     var _target:Sprite;
     var _clip(get, never):MovieClip;
@@ -16,6 +20,8 @@ class Wrapper extends Sprite {
     
     var _isParent:Bool;
     var enabled:Bool;
+    var _scriptId:String;
+    var _scriptHandlers:Map<String, Function>;
     
     public function new(target:Sprite) {
         super();
@@ -38,6 +44,9 @@ class Wrapper extends Sprite {
             addChild(_target);
         }
         
+        if(_scriptId != null)
+            ScriptInterpreter.addInterpreter(_scriptId, this);
+        
         initChildren();
         
         if (target.stage == null)
@@ -52,6 +61,10 @@ class Wrapper extends Sprite {
         
         _childWrappers = new Array<Wrapper>();
         _isParent = _target.parent == null;
+        _scriptHandlers = [
+            "goto" => script_goto,
+            "play" => script_play
+        ];
     }
     
     function initChildren():Void { }
@@ -94,14 +107,36 @@ class Wrapper extends Sprite {
         
         _target = null;
         _childWrappers = null;
+        
+        if(_scriptId != null)
+            ScriptInterpreter.removeInterpreter(_scriptId, this);
+        _scriptId = null;
     }
     
-    //@:getter(stage)
-    //override function get_stage():Stage {
-        //
-        //if (super.get_stage() != null)
-           //return super.get_stage();
-        //
-        //return _target.stage;
-    //}
+    // =================================================================================================================
+    //{ region                                              SCRIPTS
+    // =================================================================================================================
+    
+    public function runScript(action:Action):Void {
+        
+        if (Assert.isTrue(_scriptHandlers.exists(action.func), 'Invalid func=${action.func}'))
+            _scriptHandlers[action.func](action);
+        else
+            action.complete();
+    }
+    
+    function script_goto(action:Action):Void {
+        
+        _clip.gotoAndPlay(action.args[0]);
+        action.complete();
+    }
+    
+    function script_play(action:Action):Void {
+        
+        _clip.play();
+        action.complete();
+    }
+    
+    //} endregion                                           SCRIPTS
+    // =================================================================================================================
 }

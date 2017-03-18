@@ -1,5 +1,6 @@
 package com.geokureli.rapella.art.scenes;
 
+import com.geokureli.rapella.ScriptInterpreter.IScriptInterpretable;
 import com.geokureli.rapella.utils.TimeUtils;
 import hx.debug.Expect;
 import com.geokureli.rapella.art.scenes.ActionScene;
@@ -31,11 +32,15 @@ class Scene extends Wrapper {
         _data = ScriptInterpreter.getSceneData(name);
         
         super(AssetManager.getScene(name));
+        
+        if (_clip.totalFrames > 1)
+            _clip.gotoAndPlay(1);
     }
     
     override function setDefaults() {
         super.setDefaults();
         
+        _scriptId = "scene";
         _isParent = true;
         _cameraBounds = new Rectangle();
         _labels = new Map<String, FrameData>();
@@ -107,14 +112,6 @@ class Scene extends Wrapper {
     function onInteract(e:MouseEvent):Void {
         
         //InteractMenu.setTarget(cast e.currentTarget);
-    }
-    
-    public function goto(frame:Dynamic):Void {
-        
-        if(Std.is(frame, String) && _labels.exists(frame))
-            _clip.gotoAndPlay(frame);
-        else
-            _clip.gotoAndPlay(Std.parseInt(frame));
     }
     
     override public function destroy():Void {

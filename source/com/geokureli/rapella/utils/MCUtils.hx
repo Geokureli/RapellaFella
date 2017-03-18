@@ -6,8 +6,6 @@ import motion.actuators.GenericActuator;
 import motion.easing.Linear;
 import openfl.display.MovieClip;
 
-using com.geokureli.rapella.utils.StringUtils.Extender;
-
 /**
  * ...
  * @author George

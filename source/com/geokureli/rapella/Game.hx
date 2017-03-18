@@ -1,5 +1,9 @@
 package com.geokureli.rapella;
 
+import hx.debug.Assert;
+import haxe.Constraints.Function;
+import com.geokureli.rapella.ScriptInterpreter.IScriptInterpretable;
+import com.geokureli.rapella.ScriptInterpreter.Action;
 import com.geokureli.rapella.art.scenes.ActionScene;
 import flash.display.Stage;
 import com.geokureli.rapella.art.AssetManager;
@@ -14,12 +18,15 @@ import motion.easing.Linear;
 import openfl.display.Sprite;
 import openfl.events.Event;
 
-class Game extends Sprite {
+class Game
+    extends Sprite 
+    implements IScriptInterpretable {
     
     static public var mainStage(default, null):Stage;
     static public var fps(default, null):Float;
     static public var spf(default, null):Float;
     static public var currentScene(default, null):Scene;
+    static public var instance(default, null):Game;
     
     static public var camera:Camera;
 
@@ -27,10 +34,13 @@ class Game extends Sprite {
     static var _debugLayer:Sprite;
     static var _sceneMap:Map<String, Class<Scene>>;
     static var _currentSceneIndex:Int;
+    static var _scriptHandlers:Map<String, Function>;
     
     public function new () {
         
         super ();
+        
+        instance = this;
         
         if (stage != null)
             init();
@@ -48,8 +58,12 @@ class Game extends Sprite {
             "Scene3" => ActionScene
         ];
         
-    #if debug
-        AssetManager.initDebug(handleAssetsLoad);
+        _scriptHandlers = [
+            "gotoScene" => script_gotoScene
+        ];
+        
+        #if debug
+            AssetManager.initDebug(handleAssetsLoad);
         #else 
             handleAssetsLoad();
         #end
@@ -110,4 +124,26 @@ class Game extends Sprite {
         
         createScene('Scene${_currentSceneIndex + 1}');
     }
+    
+    // =================================================================================================================
+    //{ region                                              SCRIPTS
+    // =================================================================================================================
+    
+    public function runScript(action:Action):Void {
+        
+        if (Assert.isTrue(_scriptHandlers.exists(action.func), 'Invalid func=${action.func}'))
+            _scriptHandlers[action.func](action);
+        else
+            action.complete();
+    }
+    
+    function script_gotoScene(action:Action):Void {
+        
+        createScene('Scene${action.args[0]}');
+        action.complete();
+    }
+    
+    //} endregion                                           SCRIPTS
+    // =================================================================================================================
+
 }

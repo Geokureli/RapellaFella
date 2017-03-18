@@ -25,7 +25,6 @@
     <haxelib name="swf" />
     <haxelib name="signal" />
     <haxelib name="actuate" />
-    <haxelib name="polygonal-printf" />
     
     <!--<library path="Assets/swfs/TestScene.swf" id="library1" type="swflite" preload="true" />-->
     <library path="Assets/swfs/TestChoice.swf" id="library0" type="swflite" preload="true" embed="false" if    ="debug" />
