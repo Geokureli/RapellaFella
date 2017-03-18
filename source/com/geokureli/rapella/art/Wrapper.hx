@@ -1,4 +1,5 @@
 package com.geokureli.rapella.art;
+import com.geokureli.rapella.utils.MCUtils;
 import hx.debug.Assert;
 import haxe.Constraints.Function;
 import com.geokureli.rapella.ScriptInterpreter.IScriptInterpretable;
@@ -62,8 +63,10 @@ class Wrapper extends Sprite
         _childWrappers = new Array<Wrapper>();
         _isParent = _target.parent == null;
         _scriptHandlers = [
-            "goto" => script_goto,
-            "play" => script_play
+            "goto"       => script_goto,
+            "play"       => script_play,
+            "playFromTo" => script_playFromTo,
+            "playTo"     => script_playTo
         ];
     }
     
@@ -135,6 +138,23 @@ class Wrapper extends Sprite
         
         _clip.play();
         action.complete();
+    }
+    
+    function script_playFromTo(action:Action):Void
+    {
+        var from:String = action.args[0];
+        var to:String;
+        if (action.args.length > 1)
+            to = action.args[1];
+        else
+            to = from + "_end";
+        
+        MCUtils.playFromTo(_clip, from, to).onComplete(action.complete);
+    }
+
+    function script_playTo(action:Action):Void
+    {
+        MCUtils.playTo(_clip, action.args[0]).onComplete(action.complete);
     }
     
     //} endregion                                           SCRIPTS

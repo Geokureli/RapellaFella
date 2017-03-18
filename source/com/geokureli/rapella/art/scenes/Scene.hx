@@ -1,5 +1,6 @@
 package com.geokureli.rapella.art.scenes;
 
+import com.geokureli.rapella.utils.FuncUtils;
 import com.geokureli.rapella.ScriptInterpreter.IScriptInterpretable;
 import com.geokureli.rapella.utils.TimeUtils;
 import hx.debug.Expect;
@@ -132,6 +133,7 @@ class FrameData {
     
     static var _tokens:Array<String> = [
         "choice",
+        "death",
         "stop"
     ];
     
@@ -159,7 +161,7 @@ class FrameData {
             
             if (_frame.name.indexOf(token) == 0) {
                 
-                Reflect.getProperty(this, token)();
+                Reflect.getProperty(this, "label_" + token)();
                 break;
             }
         }
@@ -171,7 +173,7 @@ class FrameData {
             _frame.addEventListener(Event.FRAME_LABEL, execute);
     }
     
-    function choice():Void {
+    function label_choice():Void {
         
         if (!Expect.nonNull(_data, 'Null data [label=${_frame.name}, not stopping'))
             return;
@@ -184,19 +186,31 @@ class FrameData {
         if (Assert.nonNull(choiceUISource)) {
             
             var choiceUI = new ChoiceMenu(choiceUISource, _data);
-            choiceUI.onSelect.add(onSelectionComplete);
+            choiceUI.onSelect.add(handleSelectionComplete);
         }
     }
     
-    public function onSelectionComplete(choice:String):Void {
+    public function handleSelectionComplete(choice:String):Void {
         
         ScriptInterpreter.run(Reflect.field(_data, choice));
         handleExecuteComplete();
     }
     
-    function stop():Void {
+    function label_stop():Void {
         
         _target.stop();
+        handleExecuteComplete();
+    }
+    
+    function label_death():Void {
+        
+        _target.stop();
+        FuncUtils.addListenerOnce(SwfUtils.getMC(_target, "restartButton"), MouseEvent.CLICK, handleRestartClick);
+    }
+    
+    function handleRestartClick(e:MouseEvent):Void {
+        
+        _target.gotoAndPlay(1);
         handleExecuteComplete();
     }
     
