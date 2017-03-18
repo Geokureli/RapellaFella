@@ -5,6 +5,7 @@ package com.geokureli.rapella;
  * @author George
  */
 
+import com.geokureli.rapella.utils.StringUtils;
 import hx.debug.Assert;
 import haxe.Json;
 import Reflect;
@@ -15,7 +16,6 @@ typedef ActionHandler = String->(Void->Void)->Void;
 
 class ScriptInterpreter {
     
-    static var _funcToken:EReg = ~/^\s*([^ (]+?)\s*\.\s*([^(]+)\s*\(\s*([^ )]*)\s*\)\s*?$/;
     static var _varGetToken:EReg = ~/^\s*vars\s*\.\s*([^ =]+)\s*$/;
     static var _varSetToken:EReg = ~/^\s*vars\s*\.\s*([^ =]+)\s*=\s*([^ =]+)\s*$/;
     
@@ -133,11 +133,6 @@ class ScriptInterpreter {
         Assert.fail('unhandled action=$rawAction');
     }
     
-    static function parseArg(arg:String):String {
-        //TODO: something
-        return arg;
-    }
-    
     static function parseVar(v:String):String {
         
         if(_varGetToken.match(v))
@@ -153,13 +148,13 @@ class ScriptInterpreter {
 }
 
 interface IScriptInterpretable {
-
+    
     public function runScript(action:Action):Void;
 }
 
 class Action {
     
-    static var _funcToken:EReg = ~/^\s*([^ (]+?)\s*\.\s*([^(]+)\s*\(\s*([^ )]*)\s*\)\s*?$/;
+    static var _funcToken:EReg = ~/^\s*([^ (]+?)\s*\.\s*([^(]+)\s*\(\s*([^)]*?)\s*\)\s*?$/;
     
     public var valid (default, null):Bool;
     public var target(default, null):String;
@@ -179,7 +174,15 @@ class Action {
             target = _funcToken.matched(1);
             func   = _funcToken.matched(2);
             args   = _funcToken.matched(3).split(",");
+            
+            for(i in 0 ... args.length)
+                args[i] = parseArg(args[i]);
         }
+    }
+
+    static function parseArg(arg:String):String {
+        
+        return StringUtils.trimSpace(arg);
     }
     
     public function complete():Void {
