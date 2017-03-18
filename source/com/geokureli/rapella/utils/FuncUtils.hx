@@ -5,7 +5,7 @@ import openfl.events.EventDispatcher;
 
 class FuncUtils {
     
-    static public function addListenerOnce(dispatcher:EventDispatcher, type:String, listener:Event->Void):Event->Void {
+    static public function addListenerOnce(dispatcher:EventDispatcher, type:String, listener:Dynamic->Void):Dynamic->Void {
         
         var func:Event->Void;
         func = function (e:Event):Void {
