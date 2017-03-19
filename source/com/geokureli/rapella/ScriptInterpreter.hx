@@ -124,6 +124,8 @@ class ScriptInterpreter {
                     handle(Reflect.field(rawAction, "then"), callback);
                 else if(Reflect.hasField(rawAction, "else"))
                     handle(Reflect.field(rawAction, "else"), callback);
+                else
+                    callback();
                 
                 return;
             }
