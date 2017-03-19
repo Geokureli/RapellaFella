@@ -26,17 +26,15 @@
         }
     },
     "Scene2":{
-        "actions":[
-            {
+        "labels":{
+            "start":{
                 "if"  :"vars.killedGuard",
                 "then":"scene.goto(choice_3)",
                 "else":{
                     "if"  :"vars.hasKey",
                     "then":"scene.goto(choice_2)"
                 }
-            }
-        ],
-        "labels":{
+            },
             "choice_1":{
                 "option1": [
                     "scene.playFromTo(killGuard)",

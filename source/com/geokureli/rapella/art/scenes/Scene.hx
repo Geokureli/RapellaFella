@@ -166,14 +166,19 @@ class FrameData {
     function execute(e:Event):Void {
         _frame.removeEventListener(Event.FRAME_LABEL, execute);
         
+        var tokenFound:Bool = false;
         for (token in _tokens) {
             
             if (_frame.name.indexOf(token) == 0) {
                 
+                tokenFound = true;
                 Reflect.getProperty(this, "label_" + token)();
                 break;
             }
         }
+        
+        if (!tokenFound && _data != null)
+            ScriptInterpreter.run(_data);
     }
     
     function handleExecuteComplete():Void
