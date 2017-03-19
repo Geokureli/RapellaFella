@@ -11,25 +11,19 @@ import hx.event.Signal;
 import motion.Actuate;
 import openfl.display.Sprite;
 
-class ChoiceMenu extends Wrapper {
+class ChoiceMenu extends MenuWrapper {
     
-    static var _statToken:EReg = ~/\[(\w+)\]/;
+    static var _statToken:EReg = ~/\[(\w+)\]/i;
+    
     public var onSelect:Signal<String>;
     
-    var _data:Dynamic;
     var _options:Array<MovieClip>;
     
-    public function new(target:Sprite, data:Dynamic) {
-        _data = data;
-        
-        super(target);
-    }
+    public function new(target:Sprite, data:Dynamic) { super(target, data); }
     
     override function setDefaults() {
         super.setDefaults();
         
-        _scriptId = "choice";
-        _isParent = false;
         onSelect = new Signal<String>();
     }
     
@@ -42,8 +36,8 @@ class ChoiceMenu extends Wrapper {
         var btnY:Float = 0;
         var spacing:Float = 0;
         var textOffset:Float = 0;
-        if(Assert.isTrue(_options.length > 1 && texts.length > 0, "Only one choice given"))
-        {
+        if(Assert.isTrue(_options.length > 1 && texts.length > 0, "Only one choice given")) {
+            
             spacing = _options[1].y - _options[0].y;
             btnY = _options[0].y;
             textOffset = texts[0].y - btnY;
@@ -77,20 +71,12 @@ class ChoiceMenu extends Wrapper {
             return false;
         
         // --- CHECK CORRECT STAT
-        return !_statToken.match(text) || _statToken.matched(1) != ScriptInterpreter.getVar("stat");
-        
+        return !_statToken.match(text.toLowerCase())
+            || _statToken.matched(1) == ScriptInterpreter.getVar("stat");
     }
     
-    override function onAddedToStage(e:Event = null) {
-        super.onAddedToStage(e);
-        
-        FuncUtils.addListenerOnce(_target, Event.REMOVED, function (e:Event):Void { destroy(); } );
-        
-        _target.alpha = 0;
-        Actuate.tween(_target, .5, { alpha:1 } ).onComplete(handleShowComplete);
-    }
-    
-    function handleShowComplete():Void {
+    override function handleShowComplete():Void {
+        super.handleShowComplete();
         
         for (option in _options) {
             
@@ -122,7 +108,6 @@ class ChoiceMenu extends Wrapper {
         
         onSelect.dispose();
         
-        _data = null;
         _options = null;
     }
 }
