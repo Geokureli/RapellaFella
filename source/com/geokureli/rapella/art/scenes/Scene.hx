@@ -1,5 +1,7 @@
 package com.geokureli.rapella.art.scenes;
 
+import com.geokureli.rapella.art.ui.DeathMenu;
+import com.geokureli.rapella.utils.SwfUtils;
 import com.geokureli.rapella.utils.FuncUtils;
 import com.geokureli.rapella.ScriptInterpreter.IScriptInterpretable;
 import com.geokureli.rapella.utils.TimeUtils;
@@ -178,16 +180,10 @@ class FrameData {
         if (!Expect.nonNull(_data, 'Null data [label=${_frame.name}, not stopping'))
             return;
         
-        trace('${_target.isPlaying}');
         _target.stop();
-        trace('${_target.isPlaying}');
         
-        var choiceUISource:MovieClip = _target;
-        if (Assert.nonNull(choiceUISource)) {
-            
-            var choiceUI = new ChoiceMenu(choiceUISource, _data);
-            choiceUI.onSelect.add(handleSelectionComplete);
-        }
+        var ui = new ChoiceMenu(_target, _data);
+        ui.onSelect.add(handleSelectionComplete);
     }
     
     public function handleSelectionComplete(choice:String):Void {
@@ -205,10 +201,12 @@ class FrameData {
     function label_death():Void {
         
         _target.stop();
-        FuncUtils.addListenerOnce(SwfUtils.getMC(_target, "restartButton"), MouseEvent.CLICK, handleRestartClick);
+        
+        var ui = new DeathMenu(_target, _data);
+        ui.onClick.add(handleRestartClick);
     }
     
-    function handleRestartClick(e:MouseEvent):Void {
+    function handleRestartClick():Void {
         
         _target.gotoAndPlay(1);
         handleExecuteComplete();

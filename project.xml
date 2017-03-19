@@ -19,7 +19,7 @@
     <classpath path="../lib/HxAssert/src" />
     <!--<classpath path="../lib/HxBitmapAnim/src" />-->
     
-    <window width="960" height="540" fps="30" background="#5c94fc" hardware="true" vsync="true" />
+    <window width="960" height="540" fps="30" background="#000000" hardware="true" vsync="true" />
     
     <haxelib name="openfl" />
     <haxelib name="swf" />

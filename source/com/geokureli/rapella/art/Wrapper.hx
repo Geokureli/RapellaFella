@@ -142,6 +142,8 @@ class Wrapper extends Sprite
     
     function script_playFromTo(action:Action):Void
     {
+        _clip.stop();
+        
         var from:String = action.args[0];
         var to:String;
         if (action.args.length > 1)
@@ -154,6 +156,8 @@ class Wrapper extends Sprite
 
     function script_playTo(action:Action):Void
     {
+        _clip.stop();
+        
         MCUtils.playTo(_clip, action.args[0]).onComplete(action.complete);
     }
     
