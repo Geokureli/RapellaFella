@@ -2,33 +2,44 @@
     "Scene1":{
         "labels": {
             "choice_1": {
-                "option1": [
-                    "scene.goto(skip)"
-                ],
-                "option2": {
-                    "if": "vars.hasKey",
-                    "then": "game.goto(Scene2)",
-                    "else": "scene.goto(start)"
+                "option1": {
+                    "if"  : "vars.hasKey",
+                    "then": [
+                        "scene.playFromTo(door1, door1_end)",
+                        "game.gotoScene(3)"
+                    ],
+                    "else": [
+                        "scene.playFromTo(door1, door1Locked_end)",
+                        "scene.goto(choice_1)"
+                    ]
                 },
-                "option3": "game.goto(Scene3)",
-                "option4": "game.goto(Scene2)"
+                "option2": [
+                    "scene.playFromTo(door2)",
+                    "game.gotoScene(2)"
+                ],
+                "option3": "scene.playFromTo(door3)",
+                "option4": [
+                    "scene.playFromTo(door1Break)",
+                    "game.gotoScene(3)"
+                ]
             }
         }
     },
     "Scene2":{
         "labels":{
             "choice_1":{
-    
                 "option1": [
+                    "scene.playFromTo(killGuard)",
                     "vars.hasKey = true",
-                    "game.goto(Scene1)"
+                    "game.gotoScene(1)"
                 ],
-                "option2": {
-                    "if": "vars.hasKey",
-                    "then": "game.goto(Scene2)",
-                    "else": "scene.goto(start)"
-                },
-                "option3": "game.goto(Scene3)"
+                "option2": "scene.playFromTo(insultGuard)",
+                "option3": "game.gotoScene(1)",
+                "option4": [
+                    "scene.playFromTo(askGuard)",
+                    "vars.hasKey = true",
+                    "game.gotoScene(1)"
+                ]
             }
         }
     }
