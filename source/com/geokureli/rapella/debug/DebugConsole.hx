@@ -1,5 +1,6 @@
 package com.geokureli.rapella.debug;
 
+import openfl.filters.GlowFilter;
 import hx.event.Signal;
 import openfl.text.TextField;
 import flash.display.Sprite;
@@ -22,6 +23,8 @@ class DebugConsole extends Sprite{
         _output.x = DebugStats.GRAPH_WIDTH;
         _output.width = Game.mainStage.stageWidth - DebugStats.GRAPH_WIDTH;
         _output.height = 200;
+        
+        filters = [ new GlowFilter(0xFFFFFF, 1, 2, 2, 8, 2) ];
     }
     
     public function addLog(msg:String, forceShow:Bool = false):Void {
