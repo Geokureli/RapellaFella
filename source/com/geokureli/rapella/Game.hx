@@ -1,5 +1,6 @@
 package com.geokureli.rapella;
 
+import com.geokureli.rapella.debug.DebugConsole;
 import hx.debug.Assert;
 import haxe.Constraints.Function;
 import com.geokureli.rapella.ScriptInterpreter.IScriptInterpretable;
@@ -148,7 +149,17 @@ class Game
         action.complete();
     }
     
+    function script_log(action:Action):Void {
+        
+        DebugConsole.log(action.getFullArgs());
+        action.complete();
+    }
+    
+    function script_error(action:Action):Void {
+        
+        Assert.fail(action.getFullArgs());
+        action.complete();
+    }
     //} endregion                                           SCRIPTS
     // =================================================================================================================
-
 }

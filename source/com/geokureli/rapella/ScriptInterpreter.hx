@@ -203,4 +203,9 @@ class Action {
         func = null;
         args = null;
     }
+    
+    public function getFullArgs(sep:String = ", "):String {
+        
+        return args.join(sep);
+    }
 }
