@@ -12,8 +12,6 @@ import Reflect;
 import openfl.Assets;
 import com.geokureli.rapella.debug.Debug;
 
-typedef ActionHandler = String->(Void->Void)->Void;
-
 class ScriptInterpreter {
     
     static var _varGetToken:EReg = ~/^\s*vars\s*\.\s*([^ =]+)\s*$/;
@@ -22,13 +20,17 @@ class ScriptInterpreter {
     static var _sceneData:Map<String, Dynamic>;
     
     static var _vars:Map<String, String> = new Map<String, String>();
-    static var _handlers:Map<String, ActionHandler>;
     static var _objects:Map<String, IScriptInterpretable>;
     
     static public function init():Void {
         
-        for (varName in Reflect.fields(Debug.scriptVars))
-            _vars[varName] = Reflect.field(Debug.scriptVars, varName);
+        #if debug
+            for (varName in Reflect.fields(Debug.scriptVars))
+                _vars[varName] = Reflect.field(Debug.scriptVars, varName);
+        #else
+            if(!_vars.exists("stat"))
+                _vars["stat"] = "charisma";
+        #end
         
         var sceneDataName:String = "Scenes";
         if (Debug.sceneDataName != null)
