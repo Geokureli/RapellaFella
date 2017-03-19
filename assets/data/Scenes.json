@@ -26,11 +26,22 @@
         }
     },
     "Scene2":{
+        "actions":[
+            {
+                "if"  :"vars.killedGuard",
+                "then":"scene.goto(choice_3)",
+                "else":{
+                    "if"  :"vars.hasKey",
+                    "then":"scene.goto(choice_2)"
+                }
+            }
+        ],
         "labels":{
             "choice_1":{
                 "option1": [
                     "scene.playFromTo(killGuard)",
                     "vars.hasKey = true",
+                    "vars.killedGuard = true",
                     "game.gotoScene(1)"
                 ],
                 "option2": "scene.playFromTo(insultGuard)",
@@ -40,7 +51,9 @@
                     "vars.hasKey = true",
                     "game.gotoScene(1)"
                 ]
-            }
+            },
+            "choice_2":{ "option1":"game.gotoScene(1)" },
+            "choice_3":{ "option1":"game.gotoScene(1)" }
         }
     }
 }

@@ -112,6 +112,13 @@ class Scene extends Wrapper {
             _labels[frame.name] = new FrameData(_clip, frame, Reflect.field(labelData, frame.name));
     }
     
+    override function onAddedToStage(e:Event = null) {
+        super.onAddedToStage(e);
+        
+        if (Reflect.hasField(_data, "actions"))
+            ScriptInterpreter.run(Reflect.field(_data, "actions"));
+    }
+    
     function onInteract(e:MouseEvent):Void {
         
         //InteractMenu.setTarget(cast e.currentTarget);
