@@ -2,17 +2,11 @@ package com.geokureli.rapella.art.scenes;
 
 import com.geokureli.rapella.art.ui.DeathMenu;
 import com.geokureli.rapella.utils.SwfUtils;
-import com.geokureli.rapella.utils.FuncUtils;
-import com.geokureli.rapella.ScriptInterpreter.IScriptInterpretable;
-import com.geokureli.rapella.utils.TimeUtils;
+import com.geokureli.rapella.script.ScriptInterpreter;
 import hx.debug.Expect;
-import com.geokureli.rapella.art.scenes.ActionScene;
 import openfl.events.Event;
 import flash.display.FrameLabel;
 import com.geokureli.rapella.art.ui.ChoiceMenu;
-import hx.debug.Assert;
-import com.geokureli.rapella.art.ui.InteractMenu;
-import com.geokureli.rapella.utils.SwfUtils;
 import openfl.display.MovieClip;
 import openfl.display.Sprite;
 import openfl.events.MouseEvent;

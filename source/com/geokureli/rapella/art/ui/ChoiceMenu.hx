@@ -1,5 +1,6 @@
 package com.geokureli.rapella.art.ui;
 
+import com.geokureli.rapella.script.ScriptInterpreter;
 import com.geokureli.rapella.utils.FuncUtils;
 import hx.debug.Assert;
 import openfl.events.MouseEvent;

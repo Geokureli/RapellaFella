@@ -1,11 +1,11 @@
-package com.geokureli.rapella;
+package com.geokureli.rapella.script;
 
 /**
  * Interprets instructions from JSON
  * @author George
  */
 
-import com.geokureli.rapella.utils.StringUtils;
+import com.geokureli.rapella.script.Action.ActionMap;
 import hx.debug.Assert;
 import haxe.Json;
 import Reflect;
@@ -20,7 +20,7 @@ class ScriptInterpreter {
     static var _sceneData:Map<String, Dynamic>;
     
     static var _vars:Map<String, String> = new Map<String, String>();
-    static var _objects:Map<String, IScriptInterpretable>;
+    static var _objects:Map<String, ActionMap>;
     
     static public function init():Void {
         
@@ -41,18 +41,15 @@ class ScriptInterpreter {
         for (varName in Reflect.fields(rawSceneData))
             _sceneData[varName] = Reflect.field(rawSceneData, varName);
         
-        _objects = [
-            
-            "game"=>Game.instance
-        ];
+        _objects = new Map<String, ActionMap>();
     }
 
-    public static function addInterpreter(id:String, interpreter:IScriptInterpretable):Void {
+    public static function addInterpreter(id:String, interpreter:ActionMap):Void {
         
         _objects[id] = interpreter;
     }
 
-    public static function removeInterpreter(id:String, interpreter:IScriptInterpretable):Void {
+    public static function removeInterpreter(id:String, interpreter:ActionMap):Void {
         
         if(Assert.isTrue(_objects[id] == interpreter, "Invalid interpreter"))
             _objects.remove(id);
@@ -101,9 +98,9 @@ class ScriptInterpreter {
                 
                 if (action.valid) {
                     
-                    var object:IScriptInterpretable = _objects[action.target];
+                    var object:ActionMap = _objects[action.target];
                     if (Assert.nonNull(object))
-                        object.runScript(action);
+                        object.handle(action);
                     
                     return;
                 }
@@ -149,63 +146,4 @@ class ScriptInterpreter {
     static inline public function getSceneData(name:String):Dynamic { return _sceneData[name]; }
     
     static function emptyCallback():Void {}
-}
-
-interface IScriptInterpretable {
-    
-    public function runScript(action:Action):Void;
-}
-
-class Action {
-    
-    static var _funcToken:EReg = ~/^\s*([^ (]+?)\s*\.\s*([^(]+)\s*\(\s*([^)]*?)\s*\)\s*?$/;
-    
-    public var valid (default, null):Bool;
-    public var target(default, null):String;
-    public var func  (default, null):String;
-    public var args  (default, null):Array<String>;
-    
-    var _callback:Void->Void;
-    
-    public function new (data:String, callback:Void->Void) {
-        
-        _callback = callback;
-        
-        if (_funcToken.match(data)) {
-            
-            valid = true;
-            
-            target = _funcToken.matched(1);
-            func   = _funcToken.matched(2);
-            args   = _funcToken.matched(3).split(",");
-            
-            for(i in 0 ... args.length)
-                args[i] = parseArg(args[i]);
-        }
-    }
-
-    static function parseArg(arg:String):String {
-        
-        return StringUtils.trimSpace(arg);
-    }
-    
-    public function complete():Void {
-        
-        _callback();
-        
-        destroy();
-    }
-    
-    public function destroy():Void {
-        
-        _callback = null;
-        target = null;
-        func = null;
-        args = null;
-    }
-    
-    public function getFullArgs(sep:String = ", "):String {
-        
-        return args.join(sep);
-    }
 }

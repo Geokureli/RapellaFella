@@ -1,9 +1,9 @@
 package com.geokureli.rapella.art;
+
+import com.geokureli.rapella.script.Action.ActionHandler;
+import com.geokureli.rapella.script.Action;
+import com.geokureli.rapella.script.ScriptInterpreter;
 import com.geokureli.rapella.utils.MCUtils;
-import hx.debug.Assert;
-import haxe.Constraints.Function;
-import com.geokureli.rapella.ScriptInterpreter.IScriptInterpretable;
-import com.geokureli.rapella.ScriptInterpreter.Action;
 import openfl.events.Event;
 import openfl.display.Sprite;
 import openfl.display.MovieClip;
@@ -12,8 +12,7 @@ import openfl.display.MovieClip;
  * ...
  * @author George
  */
-class Wrapper extends Sprite
-    implements IScriptInterpretable{
+class Wrapper extends Sprite {
     
     var _target:Sprite;
     var _clip(get, never):MovieClip;
@@ -22,7 +21,7 @@ class Wrapper extends Sprite
     var _isParent:Bool;
     var enabled:Bool;
     var _scriptId:String;
-    var _scriptHandlers:Map<String, Function>;
+    var _actionMap:ActionMap;
     
     public function new(target:Sprite) {
         super();
@@ -46,7 +45,7 @@ class Wrapper extends Sprite
         }
         
         if(_scriptId != null)
-            ScriptInterpreter.addInterpreter(_scriptId, this);
+            ScriptInterpreter.addInterpreter(_scriptId, _actionMap);
         
         initChildren();
         
@@ -62,12 +61,13 @@ class Wrapper extends Sprite
         
         _childWrappers = new Array<Wrapper>();
         _isParent = _target.parent == null;
-        _scriptHandlers = [
-            "goto"       => script_goto,
-            "play"       => script_play,
-            "playFromTo" => script_playFromTo,
-            "playTo"     => script_playTo
-        ];
+        
+        _actionMap = new ActionMap();
+        _actionMap.add("goto"      , script_goto      , ["label"       ]);
+        _actionMap.add("playFromTo", script_playFromTo, ["start", "end"], true);
+        _actionMap.add("playTo"    , script_playTo    , ["start"       ], true);
+        _actionMap.add("play"      , script_play);
+        _actionMap.add("stop"      , script_stop);
     }
     
     function initChildren():Void { }
@@ -112,21 +112,16 @@ class Wrapper extends Sprite
         _childWrappers = null;
         
         if(_scriptId != null)
-            ScriptInterpreter.removeInterpreter(_scriptId, this);
+            ScriptInterpreter.removeInterpreter(_scriptId, _actionMap);
         _scriptId = null;
+        
+        _actionMap.destroy();
+        _actionMap = null;
     }
     
     // =================================================================================================================
     //{ region                                              SCRIPTS
     // =================================================================================================================
-    
-    public function runScript(action:Action):Void {
-        
-        if (Assert.isTrue(_scriptHandlers.exists(action.func), 'Invalid func=${action.func}'))
-            _scriptHandlers[action.func](action);
-        else
-            action.complete();
-    }
     
     function script_goto(action:Action):Void {
         

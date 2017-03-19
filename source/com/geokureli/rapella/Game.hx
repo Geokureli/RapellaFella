@@ -1,10 +1,9 @@
 package com.geokureli.rapella;
 
+import com.geokureli.rapella.script.Action;
 import com.geokureli.rapella.debug.DebugConsole;
 import hx.debug.Assert;
-import haxe.Constraints.Function;
-import com.geokureli.rapella.ScriptInterpreter.IScriptInterpretable;
-import com.geokureli.rapella.ScriptInterpreter.Action;
+import com.geokureli.rapella.script.ScriptInterpreter;
 import com.geokureli.rapella.art.scenes.ActionScene;
 import flash.display.Stage;
 import com.geokureli.rapella.art.AssetManager;
@@ -19,9 +18,7 @@ import motion.easing.Linear;
 import openfl.display.Sprite;
 import openfl.events.Event;
 
-class Game
-    extends Sprite 
-    implements IScriptInterpretable {
+class Game extends Sprite {
     
     static public var mainStage(default, null):Stage;
     static public var fps(default, null):Float;
@@ -35,7 +32,7 @@ class Game
     static var _debugLayer:Sprite;
     static var _sceneMap:Map<String, Class<Scene>>;
     static var _currentSceneIndex:Int;
-    static var _scriptHandlers:Map<String, Function>;
+    static var _actionMap:ActionMap;
     
     public function new () {
         
@@ -59,10 +56,11 @@ class Game
             "Scene3" => ActionScene
         ];
         
-        _scriptHandlers = [
-            "gotoScene" => script_gotoScene,
-            "nextScene" => script_nextScene
-        ];
+        _actionMap = new ActionMap();
+        _actionMap.add("gotoScene", script_gotoScene, ["id", "label"]);
+        _actionMap.add("nextScene", script_nextScene, ["label"      ]);
+        _actionMap.add("error"    , script_error);
+        _actionMap.add("log"      , script_log);
         
         #if debug
             AssetManager.initDebug(handleAssetsLoad);
@@ -98,6 +96,7 @@ class Game
         Actuate.defaultEase = Linear.easeNone;
         camera = new Camera();
         ScriptInterpreter.init();
+        ScriptInterpreter.addInterpreter("game", _actionMap);
     }
     
     function onEnterFrame(e:Event):Void {
@@ -128,14 +127,6 @@ class Game
     // =================================================================================================================
     //{ region                                              SCRIPTS
     // =================================================================================================================
-    
-    public function runScript(action:Action):Void {
-        
-        if (Assert.isTrue(_scriptHandlers.exists(action.func), 'Invalid func=${action.func}'))
-            _scriptHandlers[action.func](action);
-        else
-            action.complete();
-    }
     
     function script_gotoScene(action:Action):Void {
         
