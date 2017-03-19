@@ -59,7 +59,8 @@ class Game
         ];
         
         _scriptHandlers = [
-            "gotoScene" => script_gotoScene
+            "gotoScene" => script_gotoScene,
+            "nextScene" => script_nextScene
         ];
         
         #if debug
@@ -138,6 +139,12 @@ class Game
     function script_gotoScene(action:Action):Void {
         
         createScene('Scene${action.args[0]}');
+        action.complete();
+    }
+    
+    function script_nextScene(action:Action):Void {
+        
+        nextScene();
         action.complete();
     }
     

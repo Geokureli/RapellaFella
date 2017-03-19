@@ -140,6 +140,12 @@ class Wrapper extends Sprite
         action.complete();
     }
     
+    function script_stop(action:Action):Void {
+        
+        _clip.stop();
+        action.complete();
+    }
+    
     function script_playFromTo(action:Action):Void
     {
         _clip.stop();
