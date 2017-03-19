@@ -75,9 +75,9 @@ class Game
         
         addChild(_sceneLayer = new Sprite());
         addChild(_debugLayer = new Sprite());
-        _debugLayer.addChild(new DebugOverlay());
         
         #if debug
+            _debugLayer.addChild(new DebugOverlay());
             createScene(Debug.startingScene);
         #else
             createScene("Scene1");
@@ -90,9 +90,7 @@ class Game
     inline function initManagers():Void {
         
         // entry point
-        #if debug
-            Debug.init();
-        #end
+        Debug.init();
         AssetManager.init();
         Key.init(stage);
         Actuate.defaultEase = Linear.easeNone;

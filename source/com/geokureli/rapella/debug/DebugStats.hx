@@ -18,10 +18,10 @@ class DebugStats extends Sprite{
     
     static inline var BG_COLOR:Int = 0x000033;
     
-    static inline var GRAPH_WIDTH :Int = 70;
-    static inline var GRAPH_HEIGHT:Int = 50;
-    static inline var TEXT_HEIGHT :Int = 50;
-    static inline var END_PX      :Int = GRAPH_WIDTH - 1;
+    static public inline var GRAPH_WIDTH :Int = 70;
+    static public inline var GRAPH_HEIGHT:Int = 50;
+    static public inline var TEXT_HEIGHT :Int = 50;
+    static public inline var END_PX      :Int = GRAPH_WIDTH - 1;
     
     var _prevTimer:Int;
     var _prevSecond:Int;
