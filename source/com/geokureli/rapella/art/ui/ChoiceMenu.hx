@@ -36,9 +36,10 @@ class ChoiceMenu extends MenuWrapper {
         var btnY:Float = 0;
         var spacing:Float = 0;
         var textOffset:Float = 0;
-        if(Assert.isTrue(_options.length > 1 && texts.length > 0, "Only one choice given")) {
+        if (Assert.isTrue(_options.length > 0 && texts.length > 0, "missing choice art")) {
             
-            spacing = _options[1].y - _options[0].y;
+            if (_options.length > 1)
+                spacing = _options[1].y - _options[0].y;
             btnY = _options[0].y;
             textOffset = texts[0].y - btnY;
         }
