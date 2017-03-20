@@ -24,14 +24,19 @@ class Scene extends Wrapper {
     var _labels:Map<String, FrameData>;
     var _data:Dynamic;
     
-    public function new(name:String) {
+    public function new(name:String, startingLabel:Dynamic = null) {
         
         _data = ScriptInterpreter.getSceneData(name);
         
-        super(AssetManager.getScene(name));
+        var asset = AssetManager.getScene(name);
         
-        if (_clip.totalFrames > 1)
-            _clip.gotoAndPlay(1);
+        if (startingLabel == null)
+            startingLabel = 1;
+        
+        if (asset.totalFrames > 1)
+            asset.gotoAndPlay(startingLabel);
+        
+        super(asset);
     }
     
     override function setDefaults() {
@@ -109,7 +114,7 @@ class Scene extends Wrapper {
     override function onAddedToStage(e:Event = null) {
         super.onAddedToStage(e);
         
-        if (Reflect.hasField(_data, "actions"))
+        if (_data != null && Reflect.hasField(_data, "actions"))
             ScriptInterpreter.run(Reflect.field(_data, "actions"));
     }
     

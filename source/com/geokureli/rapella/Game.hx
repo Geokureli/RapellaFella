@@ -56,11 +56,11 @@ class Game extends Sprite {
             "Scene3" => ActionScene
         ];
         
-        _actionMap = new ActionMap();
-        _actionMap.add("gotoScene", script_gotoScene, ["id", "label"]);
-        _actionMap.add("nextScene", script_nextScene, ["label"      ]);
-        _actionMap.add("error"    , script_error);
-        _actionMap.add("log"      , script_log);
+        _actionMap = new ActionMap(this);
+        _actionMap.add("gotoScene", script_gotoScene, ["id", "?label"]);
+        _actionMap.add("nextScene", script_nextScene, ["?label"      ]);
+        _actionMap.add("error"    , script_error    , ["...msg"      ]);
+        _actionMap.add("log"      , script_log      , ["...msg"      ]);
         
         #if debug
             AssetManager.initDebug(handleAssetsLoad);
@@ -106,7 +106,7 @@ class Game extends Sprite {
         Game.camera.update();
     }
     
-     static public function createScene(name:String):Void {
+    static public function createScene(name:String, label:String = null):Void {
         
         if(currentScene != null)
             currentScene.destroy();
@@ -114,42 +114,37 @@ class Game extends Sprite {
         var sceneType:Class<Scene> = _sceneMap[name];
         if(sceneType == null)
             sceneType = Scene;
-        _sceneLayer.addChild(currentScene = Type.createInstance(sceneType,[name]));
+        
+        var args = [name];
+        if (label != null)
+            args.push(label);
+        
+        _sceneLayer.addChild(currentScene = Type.createInstance(sceneType, args));
         
         _currentSceneIndex = Std.parseInt(name.substr(5,100));
     }
     
-    inline static public function nextScene():Void {
+    inline static public function nextScene(label:String = null):Void {
         
-        createScene('Scene${_currentSceneIndex + 1}');
+        createScene('Scene${_currentSceneIndex + 1}', label);
     }
     
     // =================================================================================================================
     //{ region                                              SCRIPTS
     // =================================================================================================================
     
-    function script_gotoScene(action:Action):Void {
+    function script_gotoScene(id:String, label:String):Void { createScene('Scene${id}', label); }
+    
+    function script_nextScene(label:String):Void { nextScene(label); }
+    
+    function script_log(msg:Array<String>):Void {
         
-        createScene('Scene${action.args[0]}');
-        action.complete();
+        DebugConsole.log(msg.join(", "));
     }
     
-    function script_nextScene(action:Action):Void {
+    function script_error(msg:Array<String>):Void {
         
-        nextScene();
-        action.complete();
-    }
-    
-    function script_log(action:Action):Void {
-        
-        DebugConsole.log(action.getFullArgs());
-        action.complete();
-    }
-    
-    function script_error(action:Action):Void {
-        
-        Assert.fail(action.getFullArgs());
-        action.complete();
+        Assert.fail(msg.join(", "));
     }
     //} endregion                                           SCRIPTS
     // =================================================================================================================

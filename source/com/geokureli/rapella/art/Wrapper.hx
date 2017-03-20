@@ -62,10 +62,10 @@ class Wrapper extends Sprite {
         _childWrappers = new Array<Wrapper>();
         _isParent = _target.parent == null;
         
-        _actionMap = new ActionMap();
-        _actionMap.add("goto"      , script_goto      , ["label"       ]);
-        _actionMap.add("playFromTo", script_playFromTo, ["start", "end"], true);
-        _actionMap.add("playTo"    , script_playTo    , ["start"       ], true);
+        _actionMap = new ActionMap(this);
+        _actionMap.add("goto"      , script_goto      , ["label"        ]);
+        _actionMap.add("playFromTo", script_playFromTo, ["start", "?end"], true);
+        _actionMap.add("playTo"    , script_playTo    , ["start"        ], true);
         _actionMap.add("play"      , script_play);
         _actionMap.add("stop"      , script_stop);
     }
@@ -123,43 +123,25 @@ class Wrapper extends Sprite {
     //{ region                                              SCRIPTS
     // =================================================================================================================
     
-    function script_goto(action:Action):Void {
-        
-        _clip.gotoAndPlay(action.args[0]);
-        action.complete();
-    }
+    function script_goto(label:String):Void { _clip.gotoAndPlay(label); }
+    function script_play():Void { _clip.play(); }
+    function script_stop():Void { _clip.stop(); }
     
-    function script_play(action:Action):Void {
-        
-        _clip.play();
-        action.complete();
-    }
-    
-    function script_stop(action:Action):Void {
+    function script_playFromTo(start:String, end:String = null, callback:Void->Void):Void {
         
         _clip.stop();
-        action.complete();
+        
+        if (end == null)
+            end = start + "_end";
+        
+        MCUtils.playFromTo(_clip, start, end).onComplete(callback);
     }
     
-    function script_playFromTo(action:Action):Void
-    {
+    function script_playTo(end:String, callback:Void->Void):Void {
+        
         _clip.stop();
         
-        var from:String = action.args[0];
-        var to:String;
-        if (action.args.length > 1)
-            to = action.args[1];
-        else
-            to = from + "_end";
-        
-        MCUtils.playFromTo(_clip, from, to).onComplete(action.complete);
-    }
-
-    function script_playTo(action:Action):Void
-    {
-        _clip.stop();
-        
-        MCUtils.playTo(_clip, action.args[0]).onComplete(action.complete);
+        MCUtils.playTo(_clip, end).onComplete(callback);
     }
     
     //} endregion                                           SCRIPTS

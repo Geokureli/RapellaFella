@@ -13,6 +13,7 @@ class DeathMenu extends MenuWrapper {
     public function new(target:Sprite, data:Dynamic) { super(target, data); }
     
     override function setDefaults() {
+        super.setDefaults();
         
         onClick = new Signal<Void>();
     }

@@ -5,6 +5,7 @@ package com.geokureli.rapella.script;
  * @author George
  */
 
+import com.geokureli.rapella.debug.DebugConsole;
 import com.geokureli.rapella.script.Action.ActionMap;
 import hx.debug.Assert;
 import haxe.Json;
@@ -99,8 +100,12 @@ class ScriptInterpreter {
                 if (action.valid) {
                     
                     var object:ActionMap = _objects[action.target];
-                    if (Assert.nonNull(object))
+                    if (Assert.nonNull(object)){
+                        
+                        if (Debug.verboseScriptLog)
+                            DebugConsole.log(cast rawAction);
                         object.handle(action);
+                    }
                     
                     return;
                 }

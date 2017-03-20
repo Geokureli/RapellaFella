@@ -13,6 +13,7 @@ class Debug {
     static public var sceneDataName     :String  = null;
     static public var verboseAssertLog  :Bool    = false;
     static public var verboseExpectLog  :Bool    = false;
+    static public var verboseScriptLog  :Bool    = false;
     static public var assertThrow       :Bool    = false;
     static public var showInvalidOptions:Bool    = false;
     
