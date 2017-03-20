@@ -57,10 +57,11 @@ class Game extends Sprite {
         ];
         
         _actionMap = new ActionMap(this);
-        _actionMap.add("gotoScene", script_gotoScene, ["id", "?label"]);
-        _actionMap.add("nextScene", script_nextScene, ["?label"      ]);
-        _actionMap.add("error"    , script_error    , ["...msg"      ]);
-        _actionMap.add("log"      , script_log      , ["...msg"      ]);
+        _actionMap.add("gotoScene" , script_gotoScene , ["id", "?label"]);
+        _actionMap.add("nextScene" , script_nextScene , ["?label"      ]);
+        _actionMap.add("error"     , script_error     , ["...msg"      ]);
+        _actionMap.add("log"       , script_log       , ["...msg"      ]);
+        _actionMap.add("checkpoint", script_checkpoint);
         
         #if debug
             AssetManager.initDebug(handleAssetsLoad);
@@ -145,6 +146,11 @@ class Game extends Sprite {
     function script_error(msg:Array<String>):Void {
         
         Assert.fail(msg.join(", "));
+    }
+    
+    function script_checkpoint(msg:Array<String>):Void {
+        
+        Assert.fail("game.checkpoint() not implemented... yet");
     }
     //} endregion                                           SCRIPTS
     // =================================================================================================================

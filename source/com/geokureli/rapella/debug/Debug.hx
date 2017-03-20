@@ -52,7 +52,7 @@ class Debug {
             if (assertThrow)
                 throw '${pos.fileName}[${pos.lineNumber}]: $msg';
             else
-                trace('${pos.fileName}[${pos.lineNumber}]: $msg');
+                trace('$msg', pos);
         #else
             //TODO: something?
         #end
