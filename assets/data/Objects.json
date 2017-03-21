@@ -2,21 +2,11 @@
 	"Fan":{
 		"look":[
 			{ "Dialog":{"text":"This is some text"} },
-			{ "Dialog":{"text":"So is this"} },
-			{ "Choice":[
-					{ "text": "Choice 1",
-						"events": [
-							{ "Dialog":{"text":"You goto a key"} },
-							"Vars.hasKey=true"
-						],
-					{ "text": "Choice 2",
-						"events": { "Dialog":{"text":"No key for you"} }
-					},
-				]
-			}
+			{ "Dialog":{"text":"So is this"} }
 		],
 		"use" :{
-			"if":"Vars.hasKey", "then": { "Dialog":{"text":"foo"} },
+			"if"  : "Vars.hasKey",
+			"then": { "Dialog":{"text":"foo"} },
 			"else": { "Dialog":{"text":"bar"} }
 		}
 	}

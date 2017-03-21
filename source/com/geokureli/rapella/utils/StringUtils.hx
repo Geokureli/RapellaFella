@@ -1,26 +1,18 @@
 package com.geokureli.rapella.utils;
 
-import de.polygonal.Printf;
-import haxe.macro.Expr;
-using com.geokureli.rapella.utils.StringUtils.Extender;
-
 /**
  * ...
  * @author George
  */
-class StringUtils{
-	
-}
-
-class Extender {
-	
-	static public function vformat(s:String, args:Array<Dynamic>) {
-		
-		return Printf.format(s, args);
-	}
-	
-	macro public static function format(s:ExprOf<String>, _passedArgs:Array<Expr>):ExprOf<String> {
-		
-		return Printf.eformat(s, args);
-	}
+class StringUtils {
+    
+    static var _spaceTrimmer:EReg = ~/^\s*(.*?)\s*$/;
+    
+    static public function trimSpace(str:String):String {
+        
+        if(_spaceTrimmer.match(str))
+            return _spaceTrimmer.matched(1);
+        
+        return str;
+    }
 }

@@ -1,33 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
 <project>
-	
-	<app
-		title="Rapella Fella"
-		file="RapellaFella"
-		main="com.geokureli.rapella.Main"
-		package="com.geokureli.rapella"
-		version="1.0.0"
-		company="GeoKureli"
-	/>
-	<app path="export/release" />
-	<app path="export" if="debug" />
-	
-	<classpath name="source" />
-	<classpath path="../lib/Hi-ReS-Stats/src" />
-	<classpath path="../lib/HxAssert/src" />
-	<!--<classpath path="../lib/HxBitmapAnim/src" />-->
-	
-	<window width="960" height="540" fps="30" background="#5c94fc" hardware="true" vsync="true" />
-	
-	<haxelib name="openfl" />
-	<haxelib name="swf" />
-	<haxelib name="signal" />
-	<haxelib name="actuate" />
-	<haxelib name="polygonal-printf" />
-	
-	<library path="Assets/swfs/TestScene.swf" id="library" type="swflite" preload="true" />
-	
-	<assets path="assets" exclude="openfl.svg|*.swf" />
-	<icon path="assets/openfl.svg" />
-	
+    
+    <app
+        title="Rapella Fella"
+        file="RapellaFella"
+        main="com.geokureli.rapella.Game"
+        package="com.geokureli.rapella"
+        version="1.0.0"
+        company="GeoKureli"
+    />
+    
+    <set name="SWF_VERSION" value="11.5"/>
+    
+    <app path="export"/>
+    
+    <classpath name="source" />
+    <classpath path="../lib/Hi-ReS-Stats/src" />
+    <classpath path="../lib/HxAssert/src" />
+    <!--<classpath path="../lib/HxBitmapAnim/src" />-->
+    
+    <window width="960" height="540" fps="30" background="#000000" hardware="true" vsync="true" />
+    
+    <haxelib name="openfl" />
+    <haxelib name="swf" />
+    <haxelib name="signal" />
+    <haxelib name="actuate" />
+    
+    <!--<library path="Assets/swfs/TestScene.swf" id="library1" type="swflite" preload="true" />-->
+    <library path="Assets/swfs/TestChoice.swf" id="library0" type="swflite" preload="true" embed="false" if    ="debug" />
+    <library path="Assets/swfs/TestChoice.swf" id="library0" type="swflite" preload="true" embed="true"  unless="debug" />
+    
+    <assets path="assets" exclude="openfl.svg|*.swf" embed="false" if    ="debug"/>
+    <assets path="assets" exclude="openfl.svg|*.swf" embed="true"  unless="debug"/>
+    <icon path="assets/openfl.svg" />
+    
 </project>

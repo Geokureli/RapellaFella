@@ -1,0 +1,57 @@
+{
+    "Scene1":{
+        "labels": {
+            "choice_1": {
+                "option1": {
+                    "if"  : "vars.hasKey",
+                    "then": [
+                        "scene.playFromTo(door1, door1_end)",
+                        "game.gotoScene(3)"
+                    ],
+                    "else": [
+                        "scene.playFromTo(door1, door1Locked_end)",
+                        "scene.goto(choice_1)"
+                    ]
+                },
+                "option2": [
+                    "scene.playFromTo(door2)",
+                    "game.gotoScene(2)"
+                ],
+                "option3": "scene.playFromTo(door3)",
+                "option4": [
+                    "scene.playFromTo(door1Break)",
+                    "game.gotoScene(3)"
+                ]
+            }
+        }
+    },
+    "Scene2":{
+        "labels":{
+            "start":{
+                "if"  :"vars.killedGuard",
+                "then":"scene.goto(choice_3)",
+                "else":{
+                    "if"  :"vars.hasKey",
+                    "then":"scene.goto(choice_2)"
+                }
+            },
+            "choice_1":{
+                "option1": [
+                    "scene.playFromTo(killGuard)",
+                    "vars.hasKey = true",
+                    "vars.killedGuard = true",
+                    "game.gotoScene(1)"
+                ],
+                "option2": "scene.playFromTo(insultGuard)",
+                "option3": "game.gotoScene(1)",
+                "option4": [
+                    "scene.playFromTo(askGuard)",
+                    "vars.hasKey = true",
+                    "game.gotoScene(1)"
+                ]
+            },
+            "choice_2":{ "option1":"game.gotoScene(1)" },
+            "choice_3":{ "option1":"game.gotoScene(1)" }
+        }
+    }
+}

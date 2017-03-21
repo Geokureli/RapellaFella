@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module type="HAXE_MODULE" version="4">
+  <component name="HaxeModuleSettingsStorage">
+    <option name="buildConfig" value="3" />
+    <option name="flexSdkName" value="4.6.0" />
+    <option name="haxeTarget" value="Flash" />
+    <option name="hxmlPath" value="$MODULE_DIR$/project.xml" />
+    <option name="openFLPath" value="$MODULE_DIR$/project.xml" />
+    <option name="outputFolder" value="$MODULE_DIR$/export/production/RapellaFella" />
+  </component>
+  <component name="NewModuleRootManager" inherit-compiler-output="true">
+    <exclude-output />
+    <content url="file://$MODULE_DIR$">
+      <sourceFolder url="file://$MODULE_DIR$/source" isTestSource="false" />
+    </content>
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" name="HxAssert" level="project" />
+    <orderEntry type="library" name="haxelib" level="project" />
+    <orderEntry type="module-library">
+      <library name="haxelib|/usr/local/lib/haxe/lib/signal/1,0,2/src">
+        <CLASSES>
+          <root url="file:///usr/local/lib/haxe/lib/signal/1,0,2/src" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="file:///usr/local/lib/haxe/lib/signal/1,0,2/src" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="haxelib|/usr/local/lib/haxe/lib/openfl/4,9,0">
+        <CLASSES>
+          <root url="file:///usr/local/lib/haxe/lib/openfl/4,9,0" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="file:///usr/local/lib/haxe/lib/openfl/4,9,0" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+  </component>
+</module>
