@@ -136,11 +136,42 @@ class Action {
             
             target   = _funcToken.matched(1);
             func     = _funcToken.matched(2);
-            var tempArgs = _funcToken.matched(3).split(",");
-            
-            while(tempArgs.length > 0)
-                args.unshift(parseArg(tempArgs.pop()));
+            args     = getArgs(_funcToken.matched(3));
         }
+    }
+    
+    static function getArgs(rawArgs:String):Array<Dynamic> {
+        
+        var args = new Array<Dynamic>();
+        
+        var startIndex:Int;
+        var endIndex:Int;
+        var arg:String;
+        var tempArgs = rawArgs.split('"');
+        var innerArgs:Array<String>;
+        if(Assert.isTrue(tempArgs.length % 2 == 1, 'missing " in "$rawArgs"')) {
+            
+            for (i in 0...tempArgs.length) {
+                
+                arg = tempArgs[i];
+                if (i % 2 == 1)
+                    args.push(parseArg(arg));
+                else if (arg != "") {
+                    
+                    innerArgs = arg.split(",");
+                    if (i > 0 && Assert.isTrue(innerArgs[0] == "", 'Invalid [args="$rawArgs"]')) {
+                        
+                        innerArgs.shift();
+                        if (i < tempArgs.length - 1)
+                            Assert.isTrue(innerArgs.pop() == "", 'Invalid [args="$rawArgs"]');
+                    }
+                    
+                    while (innerArgs.length > 0)
+                        args.push(parseArg(innerArgs.shift()));
+                }
+            }
+        }
+        return args;
     }
     
     static function parseArg(arg:String):String {
