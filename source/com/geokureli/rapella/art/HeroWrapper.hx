@@ -109,7 +109,7 @@ class HeroWrapper extends Wrapper {
     
     public function play(animKey:String, reset:Bool = false):Void
     {
-        if (Assert.isTrue(_anims.exists(animKey))) {
+        if (Assert.isTrue(_anims.exists(animKey), 'Missing [animKey=$animKey]')) {
             
             if (!reset && _currentAnim == _anims[animKey])
                 return;
