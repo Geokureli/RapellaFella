@@ -114,6 +114,9 @@ class HeroWrapper extends Wrapper {
             if (!reset && _currentAnim == _anims[animKey])
                 return;
             
+            if(_currentAnim != null)
+                _currentAnim.stop();
+            
             _currentAnim = _anims[animKey];
             _currentAnim.loop(_clip);
         }
