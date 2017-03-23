@@ -1,21 +1,25 @@
 package com.geokureli.rapella.art.ui;
 
+import openfl.display.MovieClip;
+import openfl.display.DisplayObjectContainer;
 import com.geokureli.rapella.utils.SwfUtils;
 import com.geokureli.rapella.utils.FuncUtils;
 import openfl.events.MouseEvent;
 import hx.event.Signal;
-import openfl.display.Sprite;
 
 class DeathMenu extends MenuWrapper {
     
     public var onClick(default, null):Signal<Void>;
     
-    public function new(target:Sprite, data:Dynamic) { super(target, data); }
+    var _restartButton:MovieClip;
+    
+    public function new(target:DisplayObjectContainer, data:Dynamic) { super(target, data); }
     
     override function setDefaults() {
         super.setDefaults();
         
         onClick = new Signal<Void>();
+        _childMap["restartButton"] = "_restartButton";
     }
     
     override function initChildren():Void {

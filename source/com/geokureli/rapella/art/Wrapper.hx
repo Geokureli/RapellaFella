@@ -1,10 +1,14 @@
 package com.geokureli.rapella.art;
 
+import flash.display.DisplayObject;
+import com.geokureli.rapella.utils.ChildMap;
+import com.geokureli.rapella.utils.ChildMap.IChildMappable;
 import com.geokureli.rapella.script.Action.ActionHandler;
 import com.geokureli.rapella.script.Action;
 import com.geokureli.rapella.script.ScriptInterpreter;
 import com.geokureli.rapella.utils.MCUtils;
 import openfl.events.Event;
+import openfl.display.DisplayObjectContainer;
 import openfl.display.Sprite;
 import openfl.display.MovieClip;
 
@@ -12,9 +16,10 @@ import openfl.display.MovieClip;
  * ...
  * @author George
  */
-class Wrapper extends Sprite {
+class Wrapper extends Sprite 
+    implements IChildMappable {
     
-    var _target:Sprite;
+    var _target:DisplayObjectContainer;
     var _clip(get, never):MovieClip;
     var _childWrappers:Array<Wrapper>;
     
@@ -22,13 +27,39 @@ class Wrapper extends Sprite {
     var enabled:Bool;
     var _scriptId:String;
     var _actionMap:ActionMap;
+    var _childMap:Map<String, Dynamic>;
+    var _childMapper:ChildMap;
+    var _childList:Array<DisplayObject>;
     
-    public function new(target:Sprite) {
+    public function new(target:DisplayObjectContainer) {
         super();
         
-        _target = target;
-        
         setDefaults();
+        
+        if (target != null)
+            wrap(target);
+    }
+    
+    function setDefaults() {
+        
+        enabled = true;
+        
+        _childMap = new Map<String, Dynamic>();
+        _childMapper = new ChildMap(_childMap);
+        _childWrappers = new Array<Wrapper>();
+        
+        _actionMap = new ActionMap(this);
+        _actionMap.add("goto"      , script_goto      , ["label"        ]);
+        _actionMap.add("playFromTo", script_playFromTo, ["start", "?end"], true);
+        _actionMap.add("playTo"    , script_playTo    , ["start"        ], true);
+        _actionMap.add("play"      , script_play);
+        _actionMap.add("stop"      , script_stop);
+    }
+    
+    public function wrap(target:DisplayObjectContainer):Void {
+        
+        _target = target;
+        _isParent = _isParent || _target.parent == null;
         
         if (_isParent) {
             
@@ -50,27 +81,15 @@ class Wrapper extends Sprite {
         initChildren();
         
         if (target.stage == null)
-           _target.addEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
+            _target.addEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
         else
-           onAddedToStage();
+            onAddedToStage();
     }
     
-    function setDefaults() {
+    function initChildren():Void {
         
-        enabled = true;
-        
-        _childWrappers = new Array<Wrapper>();
-        _isParent = _target.parent == null;
-        
-        _actionMap = new ActionMap(this);
-        _actionMap.add("goto"      , script_goto      , ["label"        ]);
-        _actionMap.add("playFromTo", script_playFromTo, ["start", "?end"], true);
-        _actionMap.add("playTo"    , script_playTo    , ["start"        ], true);
-        _actionMap.add("play"      , script_play);
-        _actionMap.add("stop"      , script_stop);
+        _childList = _childMapper.map(this, _target);
     }
-    
-    function initChildren():Void { }
     
     function onAddedToStage(e:Event = null) {
         
@@ -117,6 +136,10 @@ class Wrapper extends Sprite {
         
         _actionMap.destroy();
         _actionMap = null;
+        
+        _childMapper.unMap(this);
+        _childMapper.destroy();
+        _childMapper = null;
     }
     
     // =================================================================================================================
@@ -127,7 +150,7 @@ class Wrapper extends Sprite {
     function script_play():Void { _clip.play(); }
     function script_stop():Void { _clip.stop(); }
     
-    function script_playFromTo(start:String, end:String = null, callback:Void->Void):Void {
+    function script_playFromTo(start:String, end:String, callback:Void->Void):Void {
         
         _clip.stop();
         
