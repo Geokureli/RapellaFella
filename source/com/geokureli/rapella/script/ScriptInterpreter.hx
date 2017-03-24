@@ -5,6 +5,7 @@ package com.geokureli.rapella.script;
  * @author George
  */
 
+import com.geokureli.rapella.art.AssetManager;
 import com.geokureli.rapella.debug.DebugConsole;
 import com.geokureli.rapella.script.Action.ActionMap;
 import hx.debug.Assert;
@@ -37,7 +38,7 @@ class ScriptInterpreter {
         if (Debug.sceneDataName != null)
             sceneDataName = Debug.sceneDataName;
         
-        var rawSceneData:Dynamic = Json.parse(Assets.getText('assets/data/$sceneDataName.json'));
+        var rawSceneData:Dynamic = Json.parse(AssetManager.getText('assets/data/$sceneDataName.json'));
         _sceneData = new Map<String, Dynamic>();
         for (varName in Reflect.fields(rawSceneData))
             _sceneData[varName] = Reflect.field(rawSceneData, varName);
