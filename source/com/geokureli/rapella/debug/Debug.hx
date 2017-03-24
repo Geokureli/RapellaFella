@@ -1,5 +1,6 @@
 package com.geokureli.rapella.debug;
 
+import com.geokureli.rapella.art.AssetManager;
 import hx.debug.Expect;
 import haxe.PosInfos;
 import hx.debug.Assert;
@@ -23,7 +24,7 @@ class Debug {
             startingScene = "Scene1";
             assertThrow = true;
             
-            var data:Dynamic = Json.parse(Assets.getText("assets/data/Debug.json"));
+            var data:Dynamic = Json.parse(AssetManager.getText("assets/data/Debug.json"));
             for (fieldName in Reflect.fields(data)) {
                 
                 if (Std.is(Reflect.field(Debug, fieldName), Bool))

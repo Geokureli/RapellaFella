@@ -82,8 +82,9 @@ class AssetManager {
         #if debug
             if (_debugAssets.exists(id))
                 return cast _debugAssets[id];
+        #else
+            return Assets.getText(id);
         #end
-        return Assets.getText(id);
     }
     
     static public function getScene(name:String):MovieClip {
