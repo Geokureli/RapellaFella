@@ -4,6 +4,8 @@ import hx.debug.Assert;
 import openfl.display.DisplayObjectContainer;
 import openfl.display.DisplayObject;
 import openfl.display.MovieClip;
+import openfl.geom.Point;
+import openfl.geom.Rectangle;
 
 /**
  * ...
@@ -83,5 +85,46 @@ class SwfUtils {
     inline static public function getMC(parent:DisplayObjectContainer, path:String):MovieClip {
         
         return get(parent, path);
+    }
+    
+    static public function swapParent(
+        child :DisplayObject,
+        parent:DisplayObjectContainer,
+        index :Int = -1):DisplayObject {
+        
+        var rect = new Rectangle(child.x, child.y, child.scaleX, child.scaleY);
+        var p = rect.topLeft;
+        
+        if (child.parent != null)
+            p = child.parent.localToGlobal(p);
+        p = parent.globalToLocal(p);
+        rect.x = p.x;
+        rect.y = p.y;
+        
+        p = rect.size;
+        var o = new Point();
+        if (child.parent != null) {
+            
+            o = child.parent.localToGlobal(o);
+            p = child.parent.localToGlobal(p);
+        }
+        o = parent.globalToLocal(o);
+        p = parent.globalToLocal(p);
+        
+        p.offset( -o.x, -o.y);
+        var len = p.length;
+        p = rect.size;
+        p.normalize(len);
+        
+        if (index > -1)
+            parent.addChildAt(child, index);
+        else
+            parent.addChild(child);
+        
+        child.x      = rect.x;
+        child.y      = rect.y;
+        child.scaleX = rect.width;
+        child.scaleY = rect.height;
+        return child;
     }
 }
