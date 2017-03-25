@@ -25,7 +25,7 @@ class DeathMenu extends MenuWrapper {
     override function initChildren():Void {
         super.initChildren();
         
-        FuncUtils.addListenerOnce(SwfUtils.getMC(_target, "restartButton"), MouseEvent.CLICK, handleClick);
+        FuncUtils.addListenerOnce(_restartButton, MouseEvent.CLICK, handleClick);
     }
     
     public function handleClick(e:MouseEvent):Void {

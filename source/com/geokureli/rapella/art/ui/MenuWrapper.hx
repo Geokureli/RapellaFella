@@ -34,14 +34,15 @@ class MenuWrapper extends Wrapper {
         _scriptId = "menu";
         
         _childMapper.sortChildren = true;
-        _childMap["bg"     ] = { field:"_bg"     , priority:ChildPriority.Optional };
+        _childMap["uiBg"   ] = { field:"_bg"     , priority:ChildPriority.Optional };
         _childMap["message"] = { field:"_message", priority:ChildPriority.Optional };
     }
     
     override function onAddedToStage(e:Event = null) {
         super.onAddedToStage(e);
         
-        _autoDestroyListener = FuncUtils.addListenerOnce(_target, Event.REMOVED, function(_):Void { destroy(); });
+        if (_isSelfContained)
+            _autoDestroyListener = FuncUtils.addListenerOnce(_target, Event.REMOVED, function(_):Void { destroy(); });
     }
     
     override function initChildren():Void {
@@ -49,7 +50,7 @@ class MenuWrapper extends Wrapper {
         
         var tweenTarget = _target;
         
-        if (_bg != null) {
+        if (_bg != null && !_isSelfContained) {
             
             tweenTarget = _bg;
             _children.remove(_bg);
