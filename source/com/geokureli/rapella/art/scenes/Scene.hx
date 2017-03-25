@@ -1,6 +1,7 @@
 package com.geokureli.rapella.art.scenes;
 
 import com.geokureli.rapella.art.ui.DeathMenu;
+import com.geokureli.rapella.art.ui.MenuWrapper;
 import com.geokureli.rapella.utils.SwfUtils;
 import com.geokureli.rapella.script.ScriptInterpreter;
 import hx.debug.Expect;
@@ -109,6 +110,12 @@ class Scene extends Wrapper {
         
         for(frame in _clip.currentLabels)
             _labels[frame.name] = new FrameData(_clip, frame, Reflect.field(labelData, frame.name));
+        
+        for (frame in _labels) {
+            
+            if (frame.isEnd && Expect.isTrue(_labels.exists(frame.beginLabel), 'found [label="${frame.name}"] without a matching "${frame.beginLabel}"'))
+                _labels[frame.beginLabel].endFrame = frame;
+        }
     }
     
     override function onAddedToStage(e:Event = null) {
@@ -139,14 +146,21 @@ class Scene extends Wrapper {
 
 class FrameData {
     
+    static inline var END:String = "_end";
+    
     static var _tokens:Array<String> = [
         "choice",
         "death",
         "stop"
     ];
     
+    public var endFrame:FrameData;
+    public var isEnd(default, null):Bool;
+    public var beginLabel(default, null):String;
     public var number(get, never):Int;
     function get_number():Int { return _frame.frame; }
+    public var name(get, never):String;
+    function get_name():String { return _frame.name; }
     
     var _target:MovieClip;
     var _frame:FrameLabel;
@@ -159,7 +173,14 @@ class FrameData {
         _frame = frame;
         _data = data;
         
-        _frame.addEventListener(Event.FRAME_LABEL, execute);
+        var i = _frame.name.indexOf(END);
+        if (i > -1 && i == _frame.name.length - END.length) {
+            
+            isEnd = true;
+            beginLabel = _frame.name.substr(0, i);
+        }
+        
+        addListeners();
     }
     
     function execute(e:Event):Void {
@@ -180,9 +201,9 @@ class FrameData {
             ScriptInterpreter.run(_data);
     }
     
-    function handleExecuteComplete():Void
+    function addListeners():Void
     {
-        if (_frame != null)
+        if (!isEnd && _frame != null)
             _frame.addEventListener(Event.FRAME_LABEL, execute);
     }
     
@@ -191,22 +212,35 @@ class FrameData {
         if (!Expect.nonNull(_data, 'Null data [label=${_frame.name}, not stopping'))
             return;
         
-        _target.stop();
-        
         var ui = new ChoiceMenu(_target, _data);
         ui.onSelect.add(handleSelectionComplete);
+        
+        if (endFrame != null) {
+            
+            ui.enabled = false;
+            FuncUtils.addListenerOnce(endFrame._frame, Event.FRAME_LABEL, label_menuEnd.bind(ui));
+        }
+        else
+            _target.stop();
+        
+    }
+    
+    function label_menuEnd(ui:MenuWrapper, e:Event):Void {
+        
+        _target.stop();
+        ui.enabled = true;
     }
     
     public function handleSelectionComplete(choice:String):Void {
         
         ScriptInterpreter.run(Reflect.field(_data, choice));
-        handleExecuteComplete();
+        addListeners();
     }
     
     function label_stop():Void {
         
         _target.stop();
-        handleExecuteComplete();
+        addListeners();
     }
     
     function label_death():Void {
@@ -220,7 +254,7 @@ class FrameData {
     function handleRestartClick():Void {
         
         _target.gotoAndPlay(1);
-        handleExecuteComplete();
+        addListeners();
     }
     
     public function destroy():Void {

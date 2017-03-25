@@ -19,6 +19,8 @@ import openfl.display.MovieClip;
 class Wrapper extends Sprite 
     implements IChildMappable {
     
+    public var enabled:Bool;
+    
     var _target:DisplayObjectContainer;
     var _clip(get, never):MovieClip;
     var _childWrappers:Array<Wrapper>;

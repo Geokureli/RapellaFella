@@ -96,6 +96,9 @@ class ChoiceMenu extends MenuWrapper {
     
     function handleClick(e:Event):Void {
         
+        if (!enabled)
+            return;
+        
         for (option in _options) {
             
             option.removeEventListener(MouseEvent.CLICK     , handleClick);
