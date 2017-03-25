@@ -78,22 +78,34 @@ class Wrapper extends Sprite
         if(_scriptId != null)
             ScriptInterpreter.addInterpreter(_scriptId, _actionMap);
         
-        initChildren();
-        
-        if (target.stage == null)
-            _target.addEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
-        else
-            onAddedToStage();
+        mapChildren();
+        if (_childMapper.mapSuccessful) {
+            
+            initChildren();
+            
+            if (target.stage == null)
+                _target.addEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
+            else
+                onAddedToStage();
+        } else 
+            abort();
     }
     
-    function initChildren():Void {
+    function mapChildren():Void {
         
         _children = _childMapper.map(this, _target);
     }
     
+    function initChildren():Void { }
+    
     function onAddedToStage(e:Event = null) {
         
         _target.removeEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
+    }
+    
+    function abort():Void {
+        
+        destroy();
     }
     
     public function update():Void {

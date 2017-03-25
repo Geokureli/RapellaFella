@@ -42,13 +42,29 @@ class MenuWrapper extends Wrapper {
         super.onAddedToStage(e);
         
         _autoDestroyListener = FuncUtils.addListenerOnce(_target, Event.REMOVED, function(_):Void { destroy(); });
+    }
+    
+    override function initChildren():Void {
+        super.initChildren();
+        
+        var tweenTarget = _target;
+        
+        if (_bg != null) {
+            
+            tweenTarget = _bg;
+            _children.remove(_bg);
+            _isSelfContained = true;
+            
+            for (child in _children)
+                SwfUtils.swapParent(child, _bg);
+        }
         
         if (_isSelfContained) {
             
-            _target.alpha = 0;
-            Actuate.tween(_target, .5, { alpha:1 } ).onComplete(handleShowComplete);
-        }
-        else
+            tweenTarget.alpha = 0;
+            Actuate.tween(tweenTarget, .5, { alpha:1 } ).onComplete(handleShowComplete);
+            
+        } else
             handleShowComplete();
     }
     

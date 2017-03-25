@@ -2,6 +2,7 @@ package com.geokureli.rapella.utils;
 
 import hx.debug.Expect;
 import hx.debug.Assert;
+import hx.debug.Require;
 import openfl.display.DisplayObject;
 import openfl.display.DisplayObjectContainer;
 import haxe.PosInfos;
@@ -17,7 +18,8 @@ class ChildMap {
     @unreflective public var sortChildren:Bool;
     
     @:unreflective var _map:Map<String, Dynamic>;
-    @:unreflective var _onFail:Signal<String, String>;
+    @:unreflective var _onFail:Signal<String>;
+    @:unreflective var _failListeners:Int;
     @:unreflective var _priorityMap:Map<ChildPriority, AssertLogger>;
     @:unreflective var _mapLog:String;
     @:unreflective var _logPriority:ChildPriority;
@@ -30,17 +32,32 @@ class ChildMap {
     
     function setDefaults():Void {
         
-        _onFail = new Signal<String, String>();
+        _onFail = new Signal<String>();
+        _failListeners = 0;
         
         _priorityMap = [
-            ChildPriority.Strict   => new AssertLogger(onAssertFail),
-            ChildPriority.Normal   => new AssertLogger(onExpectFail),
-            ChildPriority.Optional => new AssertLogger(doNothing   )
+            ChildPriority.Strict   => new AssertLogger(handleStrictFail),
+            ChildPriority.Normal   => new AssertLogger(handleFail      ),
+            ChildPriority.Optional => new AssertLogger(doNothing       )
         ];
     }
     
-    public function map(target:Dynamic, parent:DisplayObjectContainer):Array<DisplayObject>
-    {
+    public function addStrictFailListener(listener:String->Void):Void {
+        
+        _onFail.add(listener);
+        _failListeners++;
+    }
+    
+    public function removeStrictFailListener(listener:String->Void):Void {
+        
+        if (_onFail.get(listener) != null)
+            _failListeners++;
+        
+        _onFail.remove(listener);
+    }
+    
+    public function map(target:Dynamic, parent:DisplayObjectContainer):Array<DisplayObject> {
+        
         mapSuccessful = true;
         _mapLog = "";
         _logPriority = ChildPriority.Optional;
@@ -76,10 +93,15 @@ class ChildMap {
             }
         }
         
-        if (_logPriority == ChildPriority.Strict)
+        if (_logPriority == ChildPriority.Strict) {
+            
+            if (_failListeners > 0)
+                _onFail.dispatch(_mapLog);
+            else
+                Require.fail(_mapLog);
+            
+        } else if (_logPriority == ChildPriority.Normal)
             Assert.fail(_mapLog);
-        else if (_logPriority == ChildPriority.Normal)
-            Expect.fail(_mapLog);
         
         if(sortChildren)
             children.sort(sortByIndex.bind(target));
@@ -198,20 +220,21 @@ class ChildMap {
         _mapLog = null;
     }
     
-    function onAssertFail(?msg:String, ?pos:PosInfos):Void {
+    function handleStrictFail(?msg:String, ?pos:PosInfos):Void {
         
         mapSuccessful = false;
         _logPriority = ChildPriority.Strict;
         
-        _mapLog += 'ASSERT FAIL: $msg\n';
+        _mapLog += 'REQUIRE FAIL: $msg\n';
     }
     
-    function onExpectFail(?msg:String, ?pos:PosInfos):Void {
+    function handleFail(?msg:String, ?pos:PosInfos):Void {
         
+        mapSuccessful = false;
         if(_logPriority != ChildPriority.Strict)
             _logPriority = ChildPriority.Normal;
         
-        _mapLog += 'EXPECT FAIL: $msg\n';
+        _mapLog += 'ASSERT FAIL: $msg\n';
     }
     
     function doNothing(?msg:String, ?pos:PosInfos):Void {}
