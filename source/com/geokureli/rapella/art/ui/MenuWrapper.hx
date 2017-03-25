@@ -33,6 +33,7 @@ class MenuWrapper extends Wrapper {
         
         _scriptId = "menu";
         
+        _childMapper.sortChildren = true;
         _childMap["bg"     ] = { field:"_bg"     , priority:ChildPriority.Optional };
         _childMap["message"] = { field:"_message", priority:ChildPriority.Optional };
     }

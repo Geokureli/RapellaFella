@@ -14,6 +14,7 @@ class ChildMap {
     static var ARRAY_EX:EReg = ~/\[(\d*)\]/;
 
     @unreflective public var mapSuccessful(default, null):Bool;
+    @unreflective public var sortChildren:Bool;
     
     @:unreflective var _map:Map<String, Dynamic>;
     @:unreflective var _onFail:Signal<String, String>;
@@ -80,6 +81,9 @@ class ChildMap {
         else if (_logPriority == ChildPriority.Normal)
             Expect.fail(_mapLog);
         
+        if(sortChildren)
+            children.sort(sortByIndex.bind(target));
+        
         return children;
     }
     
@@ -130,6 +134,28 @@ class ChildMap {
             asset = handler.caster(asset);
         
         return asset;
+    }
+    
+    function sortByIndex(target:DisplayObjectContainer, child1:DisplayObject, child2:DisplayObject):Int {
+        
+        if (child1 == child2
+        ||  (!target.contains(child1) && !target.contains(child2)))
+            return 0;
+        if (!target.contains(child1))
+            return 1;
+        if (!target.contains(child2))
+            return -1;
+        
+        while (!child1.parent.contains(child2)) {
+        
+            child1 = child1.parent;
+            target = child1.parent;
+        }
+        
+        while (child2.parent != target)
+            child2 = child2.parent;
+        
+        return target.getChildIndex(child2) - target.getChildIndex(child1);
     }
     
     public function unMap(target:DisplayObjectContainer):Void {
