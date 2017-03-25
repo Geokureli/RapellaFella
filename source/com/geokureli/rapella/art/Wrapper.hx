@@ -29,7 +29,7 @@ class Wrapper extends Sprite
     var _actionMap:ActionMap;
     var _childMap:Map<String, Dynamic>;
     var _childMapper:ChildMap;
-    var _childList:Array<DisplayObject>;
+    var _children:Array<DisplayObject>;
     
     public function new(target:DisplayObjectContainer) {
         super();
@@ -88,7 +88,7 @@ class Wrapper extends Sprite
     
     function initChildren():Void {
         
-        _childList = _childMapper.map(this, _target);
+        _children = _childMapper.map(this, _target);
     }
     
     function onAddedToStage(e:Event = null) {
