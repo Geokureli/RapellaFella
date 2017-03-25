@@ -11,6 +11,7 @@ class Debug {
     
     static public var scriptVars        :Dynamic = null;
     static public var startingScene     :String  = null;
+    static public var startingLabel     :String  = null;
     static public var sceneDataName     :String  = null;
     static public var verboseAssertLog  :Bool    = false;
     static public var verboseExpectLog  :Bool    = false;

@@ -79,7 +79,11 @@ class Game extends Sprite {
         
         #if debug
             _debugLayer.addChild(new DebugOverlay());
-            createScene(Debug.startingScene);
+            
+            if(Debug.startingScene != null)
+                createScene(Debug.startingScene, Debug.startingLabel);
+            else
+                createScene("Scene1");
         #else
             createScene("Scene1");
         #end
