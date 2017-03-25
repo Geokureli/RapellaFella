@@ -19,4 +19,6 @@ class FuncUtils {
         
         return func;
     }
+    
+    static public function doNothing():Void { }
 }
