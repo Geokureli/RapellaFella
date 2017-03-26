@@ -124,15 +124,22 @@ class ChildMap {
             if(length != "")
                 path = path.split(length).join("");
             
-            target = SwfUtils.getAll(parent, path, target);
-            errorLog.nonNull(target, 'Missing [path=$path]');
+            var list:Array<Dynamic> = SwfUtils.getAll(parent, path);
+            errorLog.nonNull(list, 'Missing [path=$path]');
             
-            if (target != null && length != "")
-                errorLog.isTrue(target.length == Std.parseInt(length),
-                    'Invalid length [expected=$length][actual=${target.length}][path=$path]');
+            if (list != null && length != "")
+                errorLog.isTrue(list.length == Std.parseInt(length),
+                    'Invalid length [expected=$length][actual=${list.length}][path=$path]');
             
-            for (i in 0 ... target.length)
-                target[i] = applyParams(target[i], handler);
+            for (i in 0 ... list.length)
+                list[i] = applyParams(list[i], handler);
+            
+            if (target != null) {
+                
+                while (list.length > 0)
+                    target.push(cast list.pop());
+            } else
+                target = list;
             
         } else {
             

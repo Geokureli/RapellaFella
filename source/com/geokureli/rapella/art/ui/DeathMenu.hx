@@ -11,7 +11,7 @@ class DeathMenu extends MenuWrapper {
     
     public var onClick(default, null):Signal<Void>;
     
-    var _restartButton:MovieClip;
+    var _restartButton:Btn;
     
     public function new(target:DisplayObjectContainer, data:Dynamic) { super(target, data); }
     
@@ -19,17 +19,16 @@ class DeathMenu extends MenuWrapper {
         super.setDefaults();
         
         onClick = new Signal<Void>();
-        _childMap["restartButton"] = "_restartButton";
-    }
-    
-    override function init():Void {
-        super.init();
         
-        FuncUtils.addListenerOnce(_restartButton, MouseEvent.CLICK, handleClick);
+        _childMap["restartButton"] = "_restartButton";
+        _restartButton = new Btn()
+            .onClick(handleClick);
+        
     }
     
-    public function handleClick(e:MouseEvent):Void {
+    function handleClick():Void {
         
         onClick.dispatch();
+        destroy();
     }
 }

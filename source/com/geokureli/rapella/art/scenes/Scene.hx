@@ -208,13 +208,38 @@ class FrameData {
             _frame.addEventListener(Event.FRAME_LABEL, execute);
     }
     
+    function label_death():Void {
+        
+        var ui = initMenu(DeathMenu);
+        if (ui != null)
+            ui.onClick.add(handleRestartClick);
+    }
+    
+    function handleRestartClick():Void {
+        
+        _target.gotoAndPlay(1);
+        addListeners();
+    }
+    
     function label_choice():Void {
         
-        if (!Expect.nonNull(_data, 'Null data [label=${_frame.name}, not stopping'))
-            return;
+        if (Expect.nonNull(_data, 'Null data [label=${_frame.name}, not stopping')) {
+            
+            var ui = initMenu(ChoiceMenu);
+            if (ui != null)
+                ui.onSelect.add(handleSelectionComplete);
+        }
+    }
+    
+    function handleSelectionComplete(choice:String):Void {
         
-        var ui = new ChoiceMenu(_target, _data);
-        ui.onSelect.add(handleSelectionComplete);
+        ScriptInterpreter.run(Reflect.field(_data, choice));
+        addListeners();
+    }
+    
+    function initMenu<T:MenuWrapper>(menuType:Class<T>):T {
+        
+        var ui = Type.createInstance(menuType, [_target, _data]);
         
         if (endFrame != null) {
             
@@ -224,6 +249,7 @@ class FrameData {
         else
             _target.stop();
         
+        return ui;
     }
     
     function label_menuEnd(ui:MenuWrapper, e:Event):Void {
@@ -232,29 +258,9 @@ class FrameData {
         ui.enabled = true;
     }
     
-    public function handleSelectionComplete(choice:String):Void {
-        
-        ScriptInterpreter.run(Reflect.field(_data, choice));
-        addListeners();
-    }
-    
     function label_stop():Void {
         
         _target.stop();
-        addListeners();
-    }
-    
-    function label_death():Void {
-        
-        _target.stop();
-        
-        var ui = new DeathMenu(_target, _data);
-        ui.onClick.add(handleRestartClick);
-    }
-    
-    function handleRestartClick():Void {
-        
-        _target.gotoAndPlay(1);
         addListeners();
     }
     

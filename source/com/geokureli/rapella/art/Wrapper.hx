@@ -2,6 +2,7 @@ package com.geokureli.rapella.art;
 
 import com.geokureli.rapella.utils.ChildMap;
 import flash.display.DisplayObject;
+import hx.debug.Assert;
 import openfl.display.DisplayObjectContainer;
 import openfl.display.MovieClip;
 import openfl.display.Sprite;
@@ -16,7 +17,38 @@ class Wrapper extends Sprite
     
     public var target(default, null):DisplayObjectContainer;
     public var isParent(default, null):Bool;
-    public var enabled:Bool;
+    
+    public var enabled(get, set):Bool;
+    var _selfEnabled:Bool;
+    function get_enabled():Bool { return _selfEnabled && _parentEnabled; }
+    function set_enabled(value:Bool):Bool {
+        
+        if (value != _selfEnabled) {
+            
+            value = !value && _parentEnabled;
+            _selfEnabled = !_selfEnabled;
+            
+            if (enabled != value)
+                updateEnable();
+        }
+        
+        return _selfEnabled;
+    }
+    
+    var _parentEnabled(default, set):Bool;
+    function set__parentEnabled(value:Bool):Bool {
+        
+        if (value != _parentEnabled) {
+            
+            value = !value && _selfEnabled;
+            _parentEnabled = !_parentEnabled;
+            
+            if (enabled != value)
+                updateEnable();
+        }
+        
+        return _parentEnabled;
+    }
     
     var _clip(get, never):MovieClip;
     var _childWrappers:Array<Wrapper>;
@@ -36,7 +68,7 @@ class Wrapper extends Sprite
     
     function setDefaults() {
         
-        enabled = true;
+        _parentEnabled = true;
         
         _childMap = new Map<String, Dynamic>();
         _childMapper = new ChildMap(_childMap);
@@ -44,6 +76,9 @@ class Wrapper extends Sprite
     }
     
     public function wrap(target:DisplayObjectContainer):Void {
+        
+        if(!Assert.nonNull(target))
+            return;
         
         this.target = target;
         isParent = isParent || target.parent == null;
@@ -67,11 +102,13 @@ class Wrapper extends Sprite
         if (_childMapper.mapSuccessful) {
             
             init();
+            enabled = true;
             
             if (target.stage == null)
                 target.addEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
             else
                 onAddedToStage();
+                
         } else 
             abort();
     }
@@ -82,6 +119,12 @@ class Wrapper extends Sprite
     }
     
     function init():Void { }
+    
+    function updateEnable():Void 
+    {
+        for (child in _childWrappers)
+            child._parentEnabled = enabled;
+    }
     
     function onAddedToStage(e:Event = null) {
         
@@ -95,6 +138,8 @@ class Wrapper extends Sprite
     
     public function unwrap():Void {
         
+        enabled = false;
+        target.removeEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
         _childMapper.unMap(this);
         target = null;
     }
@@ -110,14 +155,21 @@ class Wrapper extends Sprite
     
     public function addWrapper(child:Wrapper):Wrapper {
         
-        if (_childWrappers.indexOf(child) == -1)
-           _childWrappers.push(child);
+        if (!Assert.nonNull(child) || !Assert.notContains(_childWrappers, child))
+            return child;
+        
+        _childWrappers.push(child);
+        child._parentEnabled = enabled;
         
         return child;
     }
     
     public function removeWrapper(child:Wrapper):Wrapper {
         
+        if (!Assert.nonNull(child) || !Assert.contains(_childWrappers, child))
+            return child;
+        
+        child._parentEnabled = true;
         _childWrappers.remove(child);
         
         return child;
