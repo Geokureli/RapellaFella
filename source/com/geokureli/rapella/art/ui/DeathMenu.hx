@@ -22,8 +22,8 @@ class DeathMenu extends MenuWrapper {
         _childMap["restartButton"] = "_restartButton";
     }
     
-    override function initChildren():Void {
-        super.initChildren();
+    override function init():Void {
+        super.init();
         
         FuncUtils.addListenerOnce(_restartButton, MouseEvent.CLICK, handleClick);
     }

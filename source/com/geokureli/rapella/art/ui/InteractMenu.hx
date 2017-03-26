@@ -27,9 +27,9 @@ class InteractMenu extends Wrapper {
 		
 		instance = this;
 		
-		_useBtn  = SwfUtils.get(_target, 'useBtn' );
-		_talkBtn = SwfUtils.get(_target, 'talkBtn');
-		_lookBtn = SwfUtils.get(_target, 'lookBtn');
+		_useBtn  = SwfUtils.get(target, 'useBtn' );
+		_talkBtn = SwfUtils.get(target, 'talkBtn');
+		_lookBtn = SwfUtils.get(target, 'lookBtn');
 		
 		_useBtn .gotoAndStop("up");
 		_talkBtn.gotoAndStop("up");

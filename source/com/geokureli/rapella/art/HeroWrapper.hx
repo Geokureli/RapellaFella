@@ -1,5 +1,5 @@
 package com.geokureli.rapella.art;
-import com.geokureli.rapella.art.Wrapper;
+import com.geokureli.rapella.art.ScriptedWrapper;
 import com.geokureli.rapella.input.Key;
 import hx.debug.Assert;
 import openfl.display.MovieClip;
@@ -11,7 +11,7 @@ import openfl.geom.Rectangle;
  * @author George
  */
 
-class HeroWrapper extends Wrapper {
+class HeroWrapper extends ScriptedWrapper {
     
     static var WALK_SPEED:Point = new Point(10, 0);
     static var RUN_SPEED :Point = new Point(20, 0);
@@ -43,7 +43,7 @@ class HeroWrapper extends Wrapper {
         super(mc);
         
         _originalScale = new Point(scaleX, scaleY);
-        _bounds = _target.getChildByName('bounds').getBounds(parent);
+        _bounds = target.getChildByName('bounds').getBounds(parent);
         _bounds.x -= x;
         _bounds.y -= y;
         _centerMass = new Point(
@@ -61,13 +61,17 @@ class HeroWrapper extends Wrapper {
     override function setDefaults() {
         super.setDefaults();
         
-        _isParent = true;
+        isParent = true;
         _anims = [
             "idle" => new Animation("idle"),
             "walk" => new Animation("walk"),
             "run"  => new Animation("run" ),
             "jump" => new Animation("jump")
         ];
+    }
+    
+    override function init():Void {
+        super.init();
         
         play("idle");
     }
@@ -122,10 +126,10 @@ class HeroWrapper extends Wrapper {
         }
     }
     
-    function get__left  ():Float { return _target.x + _bounds.left  ; }
-    function get__right ():Float { return _target.x + _bounds.right ; }
-    function get__top   ():Float { return _target.y + _bounds.top   ; }
-    function get__bottom():Float { return _target.y + _bounds.bottom; }
+    function get__left  ():Float { return target.x + _bounds.left  ; }
+    function get__right ():Float { return target.x + _bounds.right ; }
+    function get__top   ():Float { return target.y + _bounds.top   ; }
+    function get__bottom():Float { return target.y + _bounds.bottom; }
     
     public function get_centerMassX():Float { return _centerMass.x + x; }
     public function get_centerMassY():Float { return _centerMass.y + y; }

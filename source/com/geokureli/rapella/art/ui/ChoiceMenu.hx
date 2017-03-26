@@ -32,8 +32,8 @@ class ChoiceMenu extends MenuWrapper {
         _childMap['text[]'  ] = '_texts';
     }
     
-    override function initChildren():Void {
-        super.initChildren();
+    override function init():Void {
+        super.init();
         
         var btnY:Float = 0;
         var spacing:Float = 0;

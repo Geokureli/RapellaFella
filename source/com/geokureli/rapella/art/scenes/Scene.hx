@@ -2,6 +2,7 @@ package com.geokureli.rapella.art.scenes;
 
 import com.geokureli.rapella.art.ui.DeathMenu;
 import com.geokureli.rapella.art.ui.MenuWrapper;
+import com.geokureli.rapella.utils.FuncUtils;
 import com.geokureli.rapella.utils.SwfUtils;
 import com.geokureli.rapella.script.ScriptInterpreter;
 import hx.debug.Expect;
@@ -18,7 +19,7 @@ import openfl.geom.Rectangle;
  * @author George
  */
 
-class Scene extends Wrapper {
+class Scene extends ScriptedWrapper {
     
     var _cameraBounds:Rectangle;
     var _interactables:Array<Sprite>;
@@ -44,7 +45,7 @@ class Scene extends Wrapper {
         super.setDefaults();
         
         _scriptId = "scene";
-        _isParent = true;
+        isParent = true;
         _cameraBounds = new Rectangle();
         _labels = new Map<String, FrameData>();
     }
@@ -59,14 +60,14 @@ class Scene extends Wrapper {
         }
     }
     
-    override function initChildren() {
-        super.initChildren();
+    override function init() {
+        super.init();
         
-        var cameraBoundsMC:MovieClip = SwfUtils.get(_target, 'cameraBounds');
+        var cameraBoundsMC:MovieClip = SwfUtils.get(target, 'cameraBounds');
         if (cameraBoundsMC != null){ 
             
-            _cameraBounds = cameraBoundsMC.getBounds(_target);
-            _target.removeChild(cameraBoundsMC);
+            _cameraBounds = cameraBoundsMC.getBounds(target);
+            target.removeChild(cameraBoundsMC);
             
         } else {
             
@@ -78,7 +79,7 @@ class Scene extends Wrapper {
         
         initCamera();
         
-        _interactables = SwfUtils.getAll(_target, 'interactable');
+        _interactables = SwfUtils.getAll(target, 'interactable');
         for (interactable in _interactables) {
             
             interactable.useHandCursor = true;

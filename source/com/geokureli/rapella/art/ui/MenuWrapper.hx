@@ -10,7 +10,7 @@ import openfl.events.Event;
 import openfl.display.Sprite;
 import motion.Actuate;
 
-class MenuWrapper extends Wrapper {
+class MenuWrapper extends ScriptedWrapper {
     
     var _data:Dynamic;
     var _isSelfContained:Bool;
@@ -42,13 +42,13 @@ class MenuWrapper extends Wrapper {
         super.onAddedToStage(e);
         
         if (_isSelfContained)
-            _autoDestroyListener = FuncUtils.addListenerOnce(_target, Event.REMOVED, function(_):Void { destroy(); });
+            _autoDestroyListener = FuncUtils.addListenerOnce(target, Event.REMOVED, function(_):Void { destroy(); });
     }
     
-    override function initChildren():Void {
-        super.initChildren();
+    override function init():Void {
+        super.init();
         
-        var tweenTarget = _target;
+        var tweenTarget = target;
         
         if (_bg != null && !_isSelfContained) {
             
@@ -74,7 +74,7 @@ class MenuWrapper extends Wrapper {
     override public function destroy():Void {
         
         if (_autoDestroyListener != null)
-            _target.removeEventListener(Event.REMOVED, _autoDestroyListener);
+            target.removeEventListener(Event.REMOVED, _autoDestroyListener);
         
         super.destroy();
         
