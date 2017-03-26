@@ -22,24 +22,24 @@ class ActionScene extends Scene {
     /** Reusable point for shit */
     var _pt:Point;
     
-    public function new(symbolId:String) { super(symbolId); }
+    public function new(symbolId:String, data:Dynamic) { super(symbolId, data); }
     
-    override function initChildren() {
-        super.initChildren();
+    override function init() {
+        super.init();
         
-        add(_hero = new HeroWrapper(cast _target.getChildByName('hero')));
+        addWrapper(_hero = new HeroWrapper(cast target.getChildByName('hero')));
         _pt = new Point();
         
         addChild(_reticle = new Reticle())
         .visible = _showReticle;
         
-        var lights:Array<MovieClip> = SwfUtils.getAll(_target, 'light', new Array<MovieClip>());
+        var lights:Array<MovieClip> = SwfUtils.getAll(target, 'light', new Array<MovieClip>());
         for (light in lights)
             light.gotoAndStop("on");
         
-        _hero.walls = SwfUtils.getAll(_target, 'wall', new Array<MovieClip>());
+        _hero.walls = SwfUtils.getAll(target, 'wall', new Array<MovieClip>());
         
-        SwfUtils.getMC(_target, 'well').gotoAndStop("echoOpen");
+        SwfUtils.getMC(target, 'well').gotoAndStop("echoOpen");
         //SwfUtils.get(_target, 'bg').cacheAsBitmap = true;
     }
     
@@ -71,7 +71,7 @@ class ActionScene extends Scene {
         
         if (_showReticle) {
             
-            _pt.setTo(_target.mouseX - _hero.centerMassX, _target.mouseY - _hero.centerMassY);
+            _pt.setTo(target.mouseX - _hero.centerMassX, target.mouseY - _hero.centerMassY);
             if (_pt.x * _pt.x + _pt.y * _pt.y > RETICLE_MAX_DIS * RETICLE_MAX_DIS)
                 _pt.normalize(RETICLE_MAX_DIS);
             _reticle.x = _pt.x + _hero.centerMassX;

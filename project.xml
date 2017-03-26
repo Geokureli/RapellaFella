@@ -27,8 +27,10 @@
     <haxelib name="actuate" />
     
     <!--<library path="Assets/swfs/TestScene.swf" id="library1" type="swflite" preload="true" />-->
-    <library path="Assets/swfs/TestChoice.swf" id="library0" type="swflite" preload="true" embed="false" if    ="debug" />
-    <library path="Assets/swfs/TestChoice.swf" id="library0" type="swflite" preload="true" embed="true"  unless="debug" />
+    <library path="Assets/swfs/library0.swf" id="library0" type="swflite" preload="true" embed="false" if    ="debug" />
+    <library path="Assets/swfs/library0.swf" id="library0" type="swflite" preload="true" embed="true"  unless="debug" />
+    <library path="Assets/swfs/library1.swf" id="library1" type="swflite" preload="true" embed="false" if    ="debug" />
+    <library path="Assets/swfs/library1.swf" id="library1" type="swflite" preload="true" embed="true"  unless="debug" />
     
     <assets path="assets" exclude="openfl.svg|*.swf" embed="false" if    ="debug"/>
     <assets path="assets" exclude="openfl.svg|*.swf" embed="true"  unless="debug"/>

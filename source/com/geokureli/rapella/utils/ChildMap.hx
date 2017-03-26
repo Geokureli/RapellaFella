@@ -83,7 +83,9 @@ class ChildMap {
                 
                 Reflect.setField(target, handler.field, asset);
                 
-                if (Std.is(asset, DisplayObject))
+                if (Std.is(asset, IChildMappable) && !cast(asset, IChildMappable).isParent)
+                    children.push(cast(asset, IChildMappable).target);
+                else if (Std.is(asset, DisplayObject))
                     children.push(asset);
                 else if (Std.is(asset, Array)) {
                     
@@ -203,7 +205,7 @@ class ChildMap {
     function destroyChild(value:Dynamic):Void {
         
         if (Std.is(value, IChildMappable))
-            value.destroy();
+            value.unwrap();
         
         if (Std.is(value, Array)) {
             
@@ -250,6 +252,10 @@ abstract ChildPriority(String) {
 
 interface IChildMappable {
     
+    public var target(default, null):DisplayObjectContainer;
+    public var isParent(default, null):Bool;
+    
     public function wrap(target:DisplayObjectContainer):Void;
+    public function unwrap():Void;
     public function destroy():Void;
 }
