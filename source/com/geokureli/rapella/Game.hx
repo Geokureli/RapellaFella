@@ -53,7 +53,7 @@ class Game extends Sprite {
         fps = stage.frameRate;
         spf = 1 / fps;
         _sceneMap = [
-            "Scene3" => ActionScene
+            "action" => ActionScene
         ];
         
         _actionMap = new ActionMap(this);
@@ -116,15 +116,18 @@ class Game extends Sprite {
         if(currentScene != null)
             currentScene.destroy();
         
-        var sceneType:Class<Scene> = _sceneMap[name];
-        if(sceneType == null)
-            sceneType = Scene;
+        var data:Dynamic = ScriptInterpreter.getSceneData(name);
+        var type:String = Reflect.field(data, "type");
+        var sceneClass:Class<Scene> = Scene;
+        if (type != null && Assert.isTrue(_sceneMap.exists(type), 'Invalid [type="$type"]'))
+            sceneClass = _sceneMap[type];
         
-        var args = [name];
+        var args = [name, data];
         if (label != null)
             args.push(label);
         
-        _sceneLayer.addChild(currentScene = Type.createInstance(sceneType, args));
+        
+        _sceneLayer.addChild(currentScene = Type.createInstance(sceneClass, args));
         
         _currentSceneIndex = Std.parseInt(name.substr(5,100));
     }

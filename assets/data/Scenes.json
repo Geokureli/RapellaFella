@@ -1,12 +1,12 @@
 {
-    "Scene1":{
+    "Scene11":{
         "labels": {
             "choice_1": {
                 "option1": {
                     "if"  : "vars.hasKey",
                     "then": [
                         "scene.playFromTo(door1, door1_end)",
-                        "game.gotoScene(3)"
+                        "game.gotoScene(13)"
                     ],
                     "else": [
                         "scene.playFromTo(door1, door1Locked_end)",
@@ -15,17 +15,17 @@
                 },
                 "option2": [
                     "scene.playFromTo(door2)",
-                    "game.gotoScene(2)"
+                    "game.nextScene()"
                 ],
                 "option3": "scene.playFromTo(door3)",
                 "option4": [
                     "scene.playFromTo(door1Break)",
-                    "game.gotoScene(3)"
+                    "game.gotoScene(13)"
                 ]
             }
         }
     },
-    "Scene2":{
+    "Scene12":{
         "labels":{
             "start":{
                 "if"  :"vars.killedGuard",
@@ -40,18 +40,21 @@
                     "scene.playFromTo(killGuard)",
                     "vars.hasKey = true",
                     "vars.killedGuard = true",
-                    "game.gotoScene(1)"
+                    "game.gotoScene(11)"
                 ],
                 "option2": "scene.playFromTo(insultGuard)",
-                "option3": "game.gotoScene(1)",
+                "option3": "game.gotoScene(11)",
                 "option4": [
                     "scene.playFromTo(askGuard)",
                     "vars.hasKey = true",
-                    "game.gotoScene(1)"
+                    "game.gotoScene(11)"
                 ]
             },
-            "choice_2":{ "option1":"game.gotoScene(1)" },
-            "choice_3":{ "option1":"game.gotoScene(1)" }
+            "choice_2":{ "option1":"game.gotoScene(11)" },
+            "choice_3":{ "option1":"game.gotoScene(11)" }
         }
+    },
+    "Scene13": {
+        "type":"action"
     }
 }

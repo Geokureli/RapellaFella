@@ -22,7 +22,7 @@ class ActionScene extends Scene {
     /** Reusable point for shit */
     var _pt:Point;
     
-    public function new(symbolId:String) { super(symbolId); }
+    public function new(symbolId:String, data:Dynamic) { super(symbolId, data); }
     
     override function init() {
         super.init();

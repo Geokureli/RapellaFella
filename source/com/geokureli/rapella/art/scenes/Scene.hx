@@ -26,9 +26,9 @@ class Scene extends ScriptedWrapper {
     var _labels:Map<String, FrameData>;
     var _data:Dynamic;
     
-    public function new(name:String, startingLabel:Dynamic = null) {
+    public function new(name:String, data:Dynamic, startingLabel:Dynamic = null) {
         
-        _data = ScriptInterpreter.getSceneData(name);
+        _data = data;
         
         var asset = AssetManager.getScene(name);
         

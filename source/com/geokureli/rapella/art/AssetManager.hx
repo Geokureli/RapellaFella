@@ -45,24 +45,24 @@ class AssetManager {
         
         var l:Int = 0;
         var s:Int = 0;
+        var min:Int = 0;
+        
+        #if debug
+            min = Std.parseInt(Debug.startingScene.split("Scene").join(""));
+            if (min < 0)
+                min = 0;
+        #end
+        
         var library:AssetLibrary;
         do {
             
             library = lime.Assets.getLibrary('library$l');
             if (library != null) {
                 
-                #if debug
-                    if (!_scenes.exists(Debug.startingScene)
-                    &&  library.exists(Debug.startingScene, cast AssetType.MOVIE_CLIP)) {
-                        
-                        _scenes[Debug.startingScene] = 'library$l:${Debug.startingScene}';
-                    }
-                #end
-                
                 do {
                     if (library.exists('Scene$s', cast AssetType.MOVIE_CLIP))
                         _scenes['Scene$s'] = 'library$l:Scene$s';
-                    else if (s > 0)
+                    else if (s > min)
                         break;
                     
                     s++;
