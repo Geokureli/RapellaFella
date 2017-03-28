@@ -47,6 +47,7 @@ class Game extends Sprite {
     }
     
     function init(e:Event = null):Void {
+        
         removeEventListener(Event.ADDED_TO_STAGE, init);
         
         mainStage = stage;

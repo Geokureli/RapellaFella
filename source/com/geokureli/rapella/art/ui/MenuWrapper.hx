@@ -1,5 +1,6 @@
 package com.geokureli.rapella.art.ui;
 
+import com.geokureli.rapella.utils.TimeUtils;
 import flash.display.DisplayObjectContainer;
 import openfl.text.TextField;
 import com.geokureli.rapella.utils.ChildMap.ChildPriority;
@@ -14,7 +15,6 @@ class MenuWrapper extends ScriptedWrapper {
     
     var _data:Dynamic;
     var _isSelfContained:Bool;
-    var _autoDestroyListener:Dynamic->Void;
     var _bg:MovieClip;
     var _message:TextField;
     
@@ -22,8 +22,11 @@ class MenuWrapper extends ScriptedWrapper {
         _data = data;
         
         var ui:Sprite = SwfUtils.get(target, "ui");
-        if (ui != null)
+        if (ui != null) {
+            
             target = ui;
+            _isSelfContained = true;
+        }
         
         super(target);
     }
@@ -31,6 +34,7 @@ class MenuWrapper extends ScriptedWrapper {
     override function setDefaults() {
         super.setDefaults();
         
+        isParent = false;
         _scriptId = "menu";
         
         _childMapper.sortChildren = true;
@@ -38,21 +42,12 @@ class MenuWrapper extends ScriptedWrapper {
         _childMap["message"] = { field:"_message", priority:ChildPriority.Optional };
     }
     
-    override function onAddedToStage(e:Event = null) {
-        super.onAddedToStage(e);
-        
-        if (_isSelfContained)
-            _autoDestroyListener = FuncUtils.addListenerOnce(target, Event.REMOVED, function(_):Void { destroy(); });
-    }
-    
     override function init():Void {
         super.init();
         
-        var tweenTarget = target;
-        
         if (_bg != null && !_isSelfContained) {
             
-            tweenTarget = _bg;
+            target = _bg;
             _children.remove(_bg);
             _isSelfContained = true;
             
@@ -62,8 +57,8 @@ class MenuWrapper extends ScriptedWrapper {
         
         if (_isSelfContained) {
             
-            tweenTarget.alpha = 0;
-            Actuate.tween(tweenTarget, .5, { alpha:1 } ).onComplete(handleShowComplete);
+            target.alpha = 0;
+            Actuate.tween(target, .5, { alpha:1 } ).onComplete(handleShowComplete);
             
         } else
             handleShowComplete();
@@ -72,9 +67,6 @@ class MenuWrapper extends ScriptedWrapper {
     function handleShowComplete():Void { }
     
     override public function destroy():Void {
-        
-        if (_autoDestroyListener != null)
-            target.removeEventListener(Event.REMOVED, _autoDestroyListener);
         
         super.destroy();
         

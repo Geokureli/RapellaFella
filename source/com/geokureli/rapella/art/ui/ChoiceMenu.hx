@@ -16,7 +16,7 @@ class ChoiceMenu extends MenuWrapper {
     
     public var onSelect:Signal<String>;
     
-    var _options:Array<MovieClip>;
+    var _options:Array<Btn>;
     var _texts:Array<TextField>;
     
     public function new(target:Sprite, data:Dynamic) { super(target, data); }
@@ -24,12 +24,12 @@ class ChoiceMenu extends MenuWrapper {
     override function setDefaults() {
         super.setDefaults();
         
-        _options = new Array<MovieClip>();
+        _options = new Array<Btn>();
         _texts   = new Array<TextField>();
         
         onSelect = new Signal<String>();
-        _childMap['option[]'] = '_options';
-        _childMap['text[]'  ] = '_texts';
+        _childMap['option[]'] = { field:'_options', caster:Btn.caster };
+        _childMap['text[]'  ] =         '_texts'  ;
     }
     
     override function init():Void {
@@ -41,36 +41,47 @@ class ChoiceMenu extends MenuWrapper {
         if (Assert.isTrue(_options.length > 0 && _texts.length > 0, "missing choice art")) {
             
             if (_options.length > 1)
-                spacing = _options[1].y - _options[0].y;
-            btnY = _options[0].y;
+                spacing = _options[1].target.y - _options[0].target.y;
+            btnY = _options[0].target.y;
             textOffset = _texts[0].y - btnY;
         }
         
         var i:Int = _options.length;
+        var text:TextField;
         while (i-- > 0) {
             
-            if (_texts.length > i && isValidOption(i, _texts[i].text)) {
+            text = getText(i);
+            if (text != null && isValidOption(i, text.text)) {
                 
                 _texts[i].mouseEnabled = false;
-                _options[i].alpha = 0;
-                _options[i].useHandCursor = true;
                 
-                _options[i].y = btnY + spacing * i;
-                _texts[i].y = _options[i].y + textOffset;
+                _options[i].target.y = btnY + spacing * i;
+                _texts[i].y = _options[i].target.y + textOffset;
                 
             } else {
                 
-                _texts[i].visible = false;
-                _texts.splice(i, 1);
-                _options[i].visible = false;
+                if (_texts.length > i) {
+                    
+                    _texts[i].visible = false;
+                    _texts.splice(i, 1);
+                }
+                _options[i].enabled = false;
                 _options.splice(i, 1);
             }
         }
     }
     
+    function getText(i:Int):TextField {
+        
+        if (_texts.length > i)
+            return _texts[i];
+        
+        return Reflect.field(_options[i], "label");
+    }
+    
     function isValidOption(index:Int, text:String):Bool {
         
-        if (Reflect.field(_data, _options[index].name) == null)
+        if (Reflect.field(_data, _options[index].target.name) == null)
             return false;
         
         // --- CHECK CORRECT STAT
@@ -83,30 +94,17 @@ class ChoiceMenu extends MenuWrapper {
         
         for (option in _options) {
             
-            option.addEventListener(MouseEvent.CLICK     , handleClick);
-            option.addEventListener(MouseEvent.MOUSE_OVER, handleMouseRoll);
-            option.addEventListener(MouseEvent.MOUSE_OUT , handleMouseRoll);
+            option.onClick(handleClick.bind(option.target.name));
         }
     }
     
-    function handleMouseRoll(e:Event):Void {
-        
-        e.currentTarget.alpha = e.type == MouseEvent.MOUSE_OVER ? 1 : 0;
-    }
-    
-    function handleClick(e:Event):Void {
+    function handleClick(choice:String):Void {
         
         if (!enabled)
             return;
         
-        for (option in _options) {
-            
-            option.removeEventListener(MouseEvent.CLICK     , handleClick);
-            option.removeEventListener(MouseEvent.MOUSE_OVER, handleMouseRoll);
-            option.removeEventListener(MouseEvent.MOUSE_OUT , handleMouseRoll);
-        }
-        
-        onSelect.dispatch(e.currentTarget.name);
+        onSelect.dispatch(choice);
+        destroy();
     }
     
     override public function destroy():Void {
