@@ -1,8 +1,8 @@
 package com.geokureli.rapella.art.ui;
 
+import com.geokureli.rapella.art.Anim;
 import com.geokureli.rapella.art.ScriptedWrapper;
 import com.geokureli.rapella.utils.FuncUtils;
-import com.geokureli.rapella.utils.MCUtils;
 import openfl.display.DisplayObjectContainer;
 import openfl.display.InteractiveObject;
 import openfl.display.MovieClip;
@@ -134,9 +134,9 @@ class Btn extends Wrapper {
         
         if (_clip != null) {
             
-            if (MCUtils.hasFrame(_clip, mode + "_" + state))
+            if (Anim.hasFrame(_clip, mode + "_" + state))
                 _clip.gotoAndStop(mode + "_" + state);
-            else if (MCUtils.hasFrame(_clip, state))
+            else if (Anim.hasFrame(_clip, state))
                 _clip.gotoAndStop(state);
         }
     }

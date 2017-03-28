@@ -1,4 +1,5 @@
 package com.geokureli.rapella.art;
+import com.geokureli.rapella.art.Anim.AnimDef;
 import com.geokureli.rapella.art.ScriptedWrapper;
 import com.geokureli.rapella.input.Key;
 import hx.debug.Assert;
@@ -36,8 +37,8 @@ class HeroWrapper extends ScriptedWrapper {
     var _top   (get, never):Float;
     var _bottom(get, never):Float;
     
-    var _anims:Map<String, Animation>;
-    var _currentAnim:Animation;
+    var _anims:Map<String, AnimDef>;
+    var _currentAnim:AnimDef;
     
     public function new(mc:MovieClip) {
         super(mc);
@@ -63,10 +64,10 @@ class HeroWrapper extends ScriptedWrapper {
         
         isParent = true;
         _anims = [
-            "idle" => new Animation("idle"),
-            "walk" => new Animation("walk"),
-            "run"  => new Animation("run" ),
-            "jump" => new Animation("jump")
+            "idle" => new AnimDef("idle"),
+            "walk" => new AnimDef("walk"),
+            "run"  => new AnimDef("run" ),
+            "jump" => new AnimDef("jump")
         ];
     }
     

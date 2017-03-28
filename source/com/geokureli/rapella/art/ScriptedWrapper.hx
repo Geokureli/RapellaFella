@@ -2,7 +2,6 @@ package com.geokureli.rapella.art;
 
 import com.geokureli.rapella.script.Action.ActionMap;
 import com.geokureli.rapella.script.ScriptInterpreter;
-import com.geokureli.rapella.utils.MCUtils;
 import openfl.display.DisplayObjectContainer;
 
 /**
@@ -62,17 +61,14 @@ class ScriptedWrapper extends Wrapper {
         
         _clip.stop();
         
-        if (end == null)
-            end = start + "_end";
-        
-        MCUtils.playFromTo(_clip, start, end).onComplete(callback);
+        Anim.playFromTo(_clip, start, end).setOnComplete(callback);
     }
     
     function script_playTo(end:String, callback:Void->Void):Void {
         
         _clip.stop();
         
-        MCUtils.playTo(_clip, end).onComplete(callback);
+        Anim.playTo(_clip, end).setOnComplete(callback);
     }
     
     //} endregion                                           SCRIPTS
