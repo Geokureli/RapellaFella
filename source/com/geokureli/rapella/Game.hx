@@ -64,8 +64,8 @@ class Game extends Sprite {
         _actionMap.add("log"       , script_log       , ["...msg"      ]);
         _actionMap.add("checkpoint", script_checkpoint);
         
-        #if debug
-            AssetManager.initDebug(handleAssetsLoad);
+        #if !embedAssets
+            AssetManager.initDebugAssets(handleAssetsLoad);
         #else 
             handleAssetsLoad();
         #end

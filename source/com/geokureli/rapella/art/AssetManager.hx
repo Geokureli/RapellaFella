@@ -10,10 +10,10 @@ class AssetManager {
     
     static var _scenes:Map<String, String>;
     
-#if debug
+#if !embedAssets
     static var _debugAssets:Map<String, Dynamic>;
     
-    static public function initDebug(callback:Void->Void):Void {
+    static public function initDebugAssets(callback:Void->Void):Void {
         
         _debugAssets = [
             "assets/data/Debug.json"  => Assets.loadText,
@@ -79,7 +79,7 @@ class AssetManager {
     
     static public function getText(id:String):String {
         
-        #if debug
+        #if !embedAssets
             if (_debugAssets.exists(id))
                 return cast _debugAssets[id];
         #end
