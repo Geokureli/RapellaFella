@@ -1,12 +1,12 @@
 {
-    "Scene11":{
+    "Scene1":{
         "labels": {
             "choice_1": {
                 "option1": {
                     "if"  : "vars.hasKey",
                     "then": [
                         "scene.playFromTo(door1, door1_end)",
-                        "game.gotoScene(13)"
+                        "game.gotoScene(3)"
                     ],
                     "else": [
                         "scene.playFromTo(door1, door1Locked_end)",
@@ -20,12 +20,12 @@
                 "option3": "scene.playFromTo(door3)",
                 "option4": [
                     "scene.playFromTo(door1Break)",
-                    "game.gotoScene(13)"
+                    "game.gotoScene(3)"
                 ]
             }
         }
     },
-    "Scene12":{
+    "Scene2":{
         "labels":{
             "start":{
                 "if"  :"vars.killedGuard",
@@ -40,21 +40,21 @@
                     "scene.playFromTo(killGuard)",
                     "vars.hasKey = true",
                     "vars.killedGuard = true",
-                    "game.gotoScene(11)"
+                    "game.gotoScene(1)"
                 ],
                 "option2": "scene.playFromTo(insultGuard)",
-                "option3": "game.gotoScene(11)",
+                "option3": "game.gotoScene(1)",
                 "option4": [
                     "scene.playFromTo(askGuard)",
                     "vars.hasKey = true",
-                    "game.gotoScene(11)"
+                    "game.gotoScene(1)"
                 ]
             },
-            "choice_2":{ "option1":"game.gotoScene(11)" },
-            "choice_3":{ "option1":"game.gotoScene(11)" }
+            "choice_2":{ "option1":"game.gotoScene(1)" },
+            "choice_3":{ "option1":"game.gotoScene(1)" }
         }
     },
-    "Scene13": {
+    "Scene3": {
         "type":"action"
     }
 }
