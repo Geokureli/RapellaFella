@@ -30,7 +30,9 @@ class SwfUtils {
         var child:DisplayObject;
         if (_arrayToken.match(path)) {
             
-            var length:Int = Std.parseInt(_arrayToken.matched(1));
+            var length:Null<Int> = Std.parseInt(_arrayToken.matched(1));
+            if (length == null)
+                length = 0;
             path = _arrayToken.matchedLeft();
             // --- ACOUNT FOR UNEMPTY ARRAY PASSED IN
             if (length > 0)
@@ -47,7 +49,7 @@ class SwfUtils {
                 i++;
             } while (true);
             
-            Assert.isTrue(length == 0 || list.length == length, 'Count mismatch expected=$length actual=${list.length}');
+            Assert.isTrue(length == 0 || list.length == length, 'Count mismatch path=$path expected=$length actual=${list.length}');
             
         } else {
             
