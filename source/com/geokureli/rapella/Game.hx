@@ -130,7 +130,7 @@ class Game extends Sprite {
         
         _sceneLayer.addChild(currentScene = Type.createInstance(sceneClass, args));
         
-        _currentSceneIndex = Std.parseInt(name.substr(5,100));
+        _currentSceneIndex = Std.parseInt(name.substr(5));
     }
     
     inline static public function nextScene(label:String = null):Void {

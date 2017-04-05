@@ -17,6 +17,7 @@
     <classpath name="source" />
     <classpath path="../lib/Hi-ReS-Stats/src" />
     <classpath path="../lib/HxAssert/src" />
+    <classpath path="../lib/openfl" />
     <!--<classpath path="../lib/HxBitmapAnim/src" />-->
     
     <window width="960" height="540" fps="30" background="#000000" hardware="true" vsync="true" />
