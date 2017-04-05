@@ -6,6 +6,15 @@ import openfl.events.EventDispatcher;
 
 class FuncUtils {
     
+    static public function traceBind(msg:String, func:Void->Void):Void->Void {
+       
+        return function():Void {
+            
+            trace(msg);
+            func();
+        }
+    }
+    
     static public function addListenerOnce(dispatcher:EventDispatcher, type:String, listener:Dynamic->Void):Dynamic->Void {
         
         var func:Event->Void;
