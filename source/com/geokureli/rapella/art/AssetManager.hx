@@ -1,6 +1,7 @@
 package com.geokureli.rapella.art;
 
 import com.geokureli.rapella.functional.MultiListener;
+import com.geokureli.rapella.utils.TimeUtils;
 import openfl.Assets.AssetType;
 import openfl.Assets;
 import com.geokureli.rapella.debug.Debug;
@@ -21,6 +22,7 @@ class AssetManager {
         ];
         
         var listener = new MultiListener(callback);
+		TimeUtils.delay(listener.createListener("wait"));
         for (path in _debugAssets.keys()) {
             
             _debugAssets[path](path, handleAssetLoad.bind(_, path, listener.createListener(path)));
