@@ -68,6 +68,7 @@ class Anim {
         _start = getFrame(target, start);
         _end = getFrame(target, end);
         repeat = 0;
+        _repeatCount = 0;
         
         restart();
     }

@@ -38,6 +38,8 @@ class DebugStats extends Sprite{
     public function new() {
         super();
         
+        _framesTracked = 0;
+        
         _text = new TextField();
         _text.width = GRAPH_WIDTH;
         _text.height = TEXT_HEIGHT;
@@ -55,7 +57,7 @@ class DebugStats extends Sprite{
         graphics.beginBitmapFill(_graph, new Matrix(1, 0, 0, 1, 0, TEXT_HEIGHT));
         graphics.drawRect(0, TEXT_HEIGHT, GRAPH_WIDTH, GRAPH_HEIGHT);
         
-        _rect = new Rectangle(GRAPH_WIDTH - 1, 0, 1, GRAPH_HEIGHT);			
+        _rect = new Rectangle(GRAPH_WIDTH - 1, 0, 1, GRAPH_HEIGHT);
         
         addEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
         addEventListener(Event.REMOVED_FROM_STAGE, onRemovedFromStage);
