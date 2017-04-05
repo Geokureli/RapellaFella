@@ -175,7 +175,12 @@ class Wrapper extends Sprite
         return child;
     }
     
-    function get__clip():MovieClip { return cast(target, MovieClip); }
+    function get__clip():MovieClip {
+        
+        if (target == null)
+            return null;
+        return cast(target, MovieClip);
+    }
     
     public function destroy():Void {
         
