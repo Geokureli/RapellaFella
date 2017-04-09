@@ -38,9 +38,7 @@ class ScriptInterpreter {
                 _vars["stat"] = "charisma";
         #end
         
-        var rawSceneText:String = AssetManager.getText('assets/data/$sceneDataName.json');
-        trace(rawSceneText);
-        var rawSceneData:Dynamic = Json.parse(rawSceneText);
+        var rawSceneData:Dynamic = Json.parse(AssetManager.getText('assets/data/$sceneDataName.json'));
         _sceneData = new Map<String, Dynamic>();
         for (varName in Reflect.fields(rawSceneData))
             _sceneData[varName] = Reflect.field(rawSceneData, varName);
