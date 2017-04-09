@@ -8,6 +8,7 @@ import openfl.display.DisplayObjectContainer;
 import haxe.PosInfos;
 import hx.debug.AssertLogger;
 import hx.event.Signal;
+
 typedef ChildDef = { field:String, ?priority:ChildPriority, ?caster:Dynamic->Dynamic }
 
 class ChildMap {
@@ -73,7 +74,7 @@ class ChildMap {
             else 
                 handler = cast _map[path];
             
-            errorLog = _priorityMap[handler.priority];
+            errorLog = _priorityMap[handler.priority == null ? ChildPriority.Normal : handler.priority];
             
             if (handler == null || !errorLog.has(target, handler.field, 'Missing [path=$${handler.field}]'))
                 continue;
@@ -89,7 +90,7 @@ class ChildMap {
                     children.push(asset);
                 else if (Std.is(asset, Array)) {
                     
-                    for (i in 0...asset.length)
+                    for (i in 0 ... asset.length)
                         children.push(asset[i]);
                 }
             }
@@ -252,7 +253,7 @@ class ChildMap {
 @:enum 
 abstract ChildPriority(String) {
     
-    var Normal   = null;
+    var Normal   = "normal";
     var Strict   = "strict";
     var Optional = "optional";
 }
