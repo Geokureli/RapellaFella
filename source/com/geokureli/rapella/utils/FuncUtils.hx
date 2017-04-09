@@ -17,8 +17,7 @@ class FuncUtils {
     
     static public function addListenerOnce(dispatcher:EventDispatcher, type:String, listener:Dynamic->Void):Dynamic->Void {
         
-        var func:Event->Void;
-        func = function (e:Event):Void {
+        function func(e:Event):Void {
             
             dispatcher.removeEventListener(type, func);
             listener(e);
@@ -28,6 +27,8 @@ class FuncUtils {
         
         return func;
     }
+    
+    
     
     static public function doNothing():Void { }
 }
