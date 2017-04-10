@@ -10,7 +10,7 @@ import openfl.events.Event;
  * @author George
  */
 class AnimDef {
-    
+	
     public var start(default, null):Dynamic;
     public var end(default, null):Dynamic;
     public var activeAnim(default, null):Anim;
@@ -68,6 +68,7 @@ class Anim {
         _start = getFrame(target, start);
         _end = getFrame(target, end);
         repeat = 0;
+        _repeatCount = 0;
         
         restart();
     }
@@ -147,7 +148,7 @@ class Anim {
             if (frame == -1)
                 return target.totalFrames;
             
-            if (Assert.isTrue(frame < target.totalFrames))
+            if (Assert.isTrue(frame <= target.totalFrames))
                 return frame;
             
             return target.totalFrames;
@@ -171,7 +172,7 @@ class Anim {
             return false;
         
         if (Std.is(frame, Int))
-            return frame == -1 || frame < target.totalFrames;
+            return frame == -1 || frame <= target.totalFrames;
             
         if(Assert.is(frame, String)) {
             

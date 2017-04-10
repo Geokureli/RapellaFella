@@ -26,17 +26,17 @@ class ScriptInterpreter {
     
     static public function init():Void {
         
+        var sceneDataName:String = "Scenes";
         #if debug
             for (varName in Reflect.fields(Debug.scriptVars))
                 _vars[varName] = Reflect.field(Debug.scriptVars, varName);
+            
+            if (Debug.sceneDataName != null)
+                sceneDataName = Debug.sceneDataName;
         #else
             if(!_vars.exists("stat"))
                 _vars["stat"] = "charisma";
         #end
-        
-        var sceneDataName:String = "Scenes";
-        if (Debug.sceneDataName != null)
-            sceneDataName = Debug.sceneDataName;
         
         var rawSceneData:Dynamic = Json.parse(AssetManager.getText('assets/data/$sceneDataName.json'));
         _sceneData = new Map<String, Dynamic>();

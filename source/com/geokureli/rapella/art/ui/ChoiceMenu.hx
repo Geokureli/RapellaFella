@@ -28,12 +28,29 @@ class ChoiceMenu extends MenuWrapper {
         _texts   = new Array<TextField>();
         
         onSelect = new Signal<String>();
+        
+        #if flash
         _childMap['option[]'] = { field:'_options', caster:Btn.caster };
         _childMap['text[]'  ] =         '_texts'  ;
+        #end
+    }
+    
+    override function mapChildren():Void {
+        super.mapChildren();
+        
+        #if !flash
+        SwfUtils.getAll(_clip, 'text[]', _texts);
+        var list:Array<Dynamic> = SwfUtils.getAll(_clip, 'option[]');
+        while (list.length > 0) _options.push(Btn.caster(list.shift()));
+        #end
     }
     
     override function init():Void {
         super.init();
+        
+        SwfUtils.getAll(_clip, 'text[]', _texts);
+        var list:Array<Dynamic> = SwfUtils.getAll(_clip, 'option[]');
+        while (list.length > 0) _options.push(Btn.caster(list.shift()));
         
         var btnY:Float = 0;
         var spacing:Float = 0;

@@ -64,8 +64,8 @@ class Game extends Sprite {
         _actionMap.add("log"       , script_log       , ["...msg"      ]);
         _actionMap.add("checkpoint", script_checkpoint);
         
-        #if debug
-            AssetManager.initDebug(handleAssetsLoad);
+        #if !embedAssets
+            AssetManager.initDebugAssets(handleAssetsLoad);
         #else 
             handleAssetsLoad();
         #end
@@ -130,7 +130,7 @@ class Game extends Sprite {
         
         _sceneLayer.addChild(currentScene = Type.createInstance(sceneClass, args));
         
-        _currentSceneIndex = Std.parseInt(name.substr(5,100));
+        _currentSceneIndex = Std.parseInt(name.substr(5));
     }
     
     inline static public function nextScene(label:String = null):Void {

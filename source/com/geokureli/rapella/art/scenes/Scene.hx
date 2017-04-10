@@ -181,11 +181,11 @@ class FrameData {
             beginLabel = _frame.name.substr(0, i);
         }
         
-        addListeners();
+        if (!isEnd && _frame != null)
+            _target.addFrameScript(number-1, execute);
     }
     
-    function execute(e:Event):Void {
-        _frame.removeEventListener(Event.FRAME_LABEL, execute);
+    function execute():Void {
         
         var tokenFound:Bool = false;
         for (token in _tokens) {
@@ -202,12 +202,6 @@ class FrameData {
             ScriptInterpreter.run(_data);
     }
     
-    function addListeners():Void
-    {
-        if (!isEnd && _frame != null)
-            _frame.addEventListener(Event.FRAME_LABEL, execute);
-    }
-    
     function label_death():Void {
         
         var ui = initMenu(DeathMenu);
@@ -218,12 +212,11 @@ class FrameData {
     function handleRestartClick():Void {
         
         _target.gotoAndPlay(1);
-        addListeners();
     }
     
     function label_choice():Void {
         
-        if (Expect.nonNull(_data, 'Null data [label=${_frame.name}, not stopping')) {
+        if (Expect.nonNull(_data, 'Null data [label=${_frame.name}] not stopping')) {
             
             var ui = initMenu(ChoiceMenu);
             if (ui != null)
@@ -234,7 +227,6 @@ class FrameData {
     function handleSelectionComplete(choice:String):Void {
         
         ScriptInterpreter.run(Reflect.field(_data, choice));
-        addListeners();
     }
     
     function initMenu<T:MenuWrapper>(menuType:Class<T>):T {
@@ -244,7 +236,7 @@ class FrameData {
         if (endFrame != null) {
             
             ui.enabled = false;
-            FuncUtils.addListenerOnce(endFrame._frame, Event.FRAME_LABEL, label_menuEnd.bind(ui));
+            FuncUtils.addFrameScriptOnce(_target, endFrame.number - 1, label_menuEnd.bind(ui));
         }
         else
             _target.stop();
@@ -252,7 +244,7 @@ class FrameData {
         return ui;
     }
     
-    function label_menuEnd(ui:MenuWrapper, e:Event):Void {
+    function label_menuEnd(ui:MenuWrapper):Void {
         
         _target.stop();
         ui.enabled = true;
@@ -261,12 +253,11 @@ class FrameData {
     function label_stop():Void {
         
         _target.stop();
-        addListeners();
     }
     
     public function destroy():Void {
         
-        _frame.removeEventListener(Event.FRAME_LABEL, execute);
+        _target.addFrameScript(number, null);
         
         _data = null;
         _frame = null;
