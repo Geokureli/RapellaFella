@@ -106,8 +106,10 @@ class ChildMap {
         } else if (_logPriority == ChildPriority.Normal)
             Assert.fail(_mapLog);
         
-        if(sortChildren)
+        #if !windows
+        if (sortChildren)
             children.sort(sortByIndex.bind(target));
+        #end
         
         return children;
     }
