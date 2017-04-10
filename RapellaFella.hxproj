@@ -60,6 +60,7 @@
     <hidden path="git.pub" />
     <hidden path="export\test\flash\debug\haxe" />
     <hidden path="export\test\flash\debug\obj" />
+    <hidden path=".travis.yml" />
   </hiddenPaths>
   <!-- Executed before build -->
   <preBuildCommand>"$(CompilerPath)/haxelib" run lime build "$(OutputFile)" $(TargetBuild) -$(BuildConfig) -Dfdb</preBuildCommand>
