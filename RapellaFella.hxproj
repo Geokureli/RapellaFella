@@ -25,13 +25,14 @@
     <class path="source" />
     <class path="..\lib\Hi-ReS-Stats\src" />
     <class path="..\lib\HxAssert\src" />
+    <class path="..\lib\openfl" />
     <class path="C:\Users\Yeehaw McKickass\windows\openfl\4,9,1\externs\core\openfl" />
     <class path="C:\Users\Yeehaw McKickass\windows\openfl\4,9,1\externs\extras" />
     <class path="export\flash\debug\haxe" />
   </classpaths>
   <!-- Build options -->
   <build>
-    <option directives="openfl=4.9.1&#xA;lime=4.0.2&#xA;swf=2.3.1&#xA;signal_stoppable&#xA;signal=1.0.2&#xA;actuate=1.8.7&#xA;tools=4.0.2&#xA;no-compilation&#xA;openfl-flash&#xA;web&#xA;display" />
+    <option directives="openfl=4.9.1&#xA;lime=4.0.2&#xA;swf=2.3.1&#xA;signal_stoppable&#xA;signal=1.0.2&#xA;actuate=1.8.7&#xA;tools=4.0.2&#xA;swf-parent-fps&#xA;no-compilation&#xA;openfl-flash&#xA;web&#xA;display" />
     <option flashStrict="False" />
     <option noInlineOnDebug="False" />
     <option mainClass="ApplicationMain" />
@@ -49,6 +50,16 @@
   <!-- Paths to exclude from the Project Explorer tree -->
   <hiddenPaths>
     <hidden path="obj" />
+    <hidden path="export\flash\debug\haxe" />
+    <hidden path="export\flash\debug\obj" />
+    <hidden path="export\flash\release\haxe" />
+    <hidden path="export\flash\release\obj" />
+    <hidden path="export\html5\debug\haxe" />
+    <hidden path="git" />
+    <hidden path="RapellaFella.iml" />
+    <hidden path="git.pub" />
+    <hidden path="export\test\flash\debug\haxe" />
+    <hidden path="export\test\flash\debug\obj" />
   </hiddenPaths>
   <!-- Executed before build -->
   <preBuildCommand>"$(CompilerPath)/haxelib" run lime build "$(OutputFile)" $(TargetBuild) -$(BuildConfig) -Dfdb</preBuildCommand>

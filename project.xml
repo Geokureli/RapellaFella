@@ -27,15 +27,21 @@
     <haxelib name="signal" />
     <haxelib name="actuate" />
     
+    <haxedef name="swf-parent-fps" />
+    <define name="defaultNonEmbed" if="windows || neko" />
     <define name="embedAssets" unless="debug flash" />
     
-    <library path="Assets/swfs/library0.swf" id="library0" preload="true" embed="true" if="embedAssets" />
-    <library path="Assets/swfs/library1.swf" id="library1" preload="true" embed="true" if="embedAssets" />
+    <library path="Assets/swfs/library0.swf" id="library0" type="swflite" preload="true" embed="true" if="embedAssets" />
+    <library path="Assets/swfs/library1.swf" id="library1" type="swflite" preload="true" embed="true" if="embedAssets" />
     <assets path="assets" exclude="openfl.svg|*.swf" embed="true" if="embedAssets" />
     
-    <library path="Assets/swfs/library0.swf" id="library0" preload="true" embed="false" unless="embedAssets"/>
-    <library path="Assets/swfs/library1.swf" id="library1" preload="true" embed="false" unless="embedAssets"/>
+    <library path="Assets/swfs/library0.swf" id="library0" type="swflite" preload="true" embed="false" unless="embedAssets"/>
+    <library path="Assets/swfs/library1.swf" id="library1" type="swflite" preload="true" embed="false" unless="embedAssets"/>
     <assets path="assets" exclude="openfl.svg|*.swf" embed="false" unless="embedAssets"/>
+    
+    <!--<library path="Assets/swfs/library0.swf" id="library0" type="swflite" preload="true" />-->
+    <!--<library path="Assets/swfs/library1.swf" id="library1" type="swflite" preload="true" />-->
+    <!--<assets path="assets" exclude="openfl.svg|*.swf" />-->
     <!--<icon path="assets/openfl.svg" />-->
     
 </project>
