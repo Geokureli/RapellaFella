@@ -1,6 +1,7 @@
 package com.geokureli.rapella.utils;
 
 import haxe.Constraints.Function;
+import openfl.display.MovieClip;
 import openfl.events.Event;
 import openfl.events.EventDispatcher;
 
@@ -28,7 +29,18 @@ class FuncUtils {
         return func;
     }
     
-    
+    static public function addFrameScriptOnce(clip:MovieClip, frame:Int, script:Void->Void):Void->Void {
+        
+        function func():Void {
+            
+            clip.addFrameScript(frame, null);
+            script();
+        }
+        
+        clip.addFrameScript(frame, func);
+        
+        return func;
+    }
     
     static public function doNothing():Void { }
 }
