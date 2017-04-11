@@ -15,7 +15,6 @@
     <app path="export"/>
     
     <classpath name="source" />
-    <classpath path="../lib/Hi-ReS-Stats/src" />
     <classpath path="../lib/HxAssert/src" />
     <classpath path="../lib/openfl" />
     <!--<classpath path="../lib/HxBitmapAnim/src" />-->

@@ -23,7 +23,6 @@
     <class path="C:\Users\Yeehaw McKickass\windows\signal\1,0,2\src" />
     <class path="C:\Users\Yeehaw McKickass\windows\actuate\1,8,7" />
     <class path="source" />
-    <class path="..\lib\Hi-ReS-Stats\src" />
     <class path="..\lib\HxAssert\src" />
     <class path="..\lib\openfl" />
     <class path="C:\Users\Yeehaw McKickass\windows\openfl\4,9,1\externs\core\openfl" />
@@ -60,6 +59,7 @@
     <hidden path="git.pub" />
     <hidden path="export\test\flash\debug\haxe" />
     <hidden path="export\test\flash\debug\obj" />
+    <hidden path=".travis.yml" />
   </hiddenPaths>
   <!-- Executed before build -->
   <preBuildCommand>"$(CompilerPath)/haxelib" run lime build "$(OutputFile)" $(TargetBuild) -$(BuildConfig) -Dfdb</preBuildCommand>
