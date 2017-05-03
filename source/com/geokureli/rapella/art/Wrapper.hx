@@ -1,6 +1,7 @@
 package com.geokureli.rapella.art;
 
 import com.geokureli.rapella.utils.ChildMap;
+import com.geokureli.rapella.utils.SwfUtils;
 import flash.display.DisplayObject;
 import hx.debug.Assert;
 import openfl.display.DisplayObjectContainer;
@@ -173,6 +174,18 @@ class Wrapper extends Sprite
         _childWrappers.remove(child);
         
         return child;
+    }
+    
+    @:generic 
+    inline function getChild<T:DisplayObject>(path:String):T {
+        
+        return SwfUtils.get(target, path);
+    }
+    
+    @:generic 
+    inline function getChildList<T:DisplayObject>(path:String, ?list:Array<T>):Array<T> {
+        
+        return SwfUtils.getAll(target, path, list);
     }
     
     function get__clip():MovieClip {
