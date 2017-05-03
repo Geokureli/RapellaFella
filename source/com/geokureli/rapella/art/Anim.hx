@@ -2,6 +2,8 @@ package com.geokureli.rapella.art;
 
 import com.geokureli.rapella.utils.TimeUtils;
 import hx.debug.Assert;
+import motion.Actuate;
+import motion.actuators.IGenericActuator;
 import openfl.display.MovieClip;
 import openfl.events.Event;
 
@@ -10,28 +12,31 @@ import openfl.events.Event;
  * @author George
  */
 class AnimDef {
-	
+    
     public var start(default, null):Dynamic;
     public var end(default, null):Dynamic;
     public var activeAnim(default, null):Anim;
+    public var loop(default, null):Bool;
     
-    public function new(start:Dynamic, ?end:Dynamic) {
+    public function new(start:Dynamic, ?end:Dynamic, loop:Bool = true) {
         
         this.start = start;
         this.end = end;
+        this.loop = loop;
     }
     
     public function play(target:MovieClip):Anim {
         
         stop();
         
-        return activeAnim = Anim.playFromTo(target, start, end);
-    }
-    
-    inline public function loop(target:MovieClip, numLoops:Int = -1):Anim {
+        if (end == null && !Anim.hasFrame(target, start + Anim.END)) {
+            
+            target.gotoAndStop(start);
+            return null;
+        }
         
-        return play(target)
-            .setRepeat(numLoops);
+        return activeAnim = Anim.playFromTo(target, start, end)
+            .setRepeat(loop ? -1 : 0);
     }
     
     inline public function stop():Void {
@@ -41,9 +46,14 @@ class AnimDef {
         
         activeAnim = null;
     }
+    
+    static inline public function create    (start:Dynamic, ?end:Dynamic):AnimDef { return new AnimDef(start, end); }
+    static inline public function createLoop(start:Dynamic, ?end:Dynamic):AnimDef { return new AnimDef(start, end, true); }
 }
 
 class Anim {
+    
+    static inline public var END:String = "_end";
     
     public var repeat:Int;
     public var onComplete:Void->Void;
@@ -53,6 +63,7 @@ class Anim {
     var _start:Int;
     var _end:Int;
     var _repeatCount:Int;
+    var _replayTimer:IGenericActuator;
     
     public function new (target:MovieClip, start:Dynamic, end:Dynamic) {
         
@@ -61,8 +72,8 @@ class Anim {
         if (end == null) {
             
             end = -1;
-            if(Std.is(start, String) && hasFrame(target, Std.string(start) + "_end"))
-                end = Std.string(start) + "_end";
+            if(Std.is(start, String) && hasFrame(target, Std.string(start) + END))
+                end = Std.string(start) + END;
         }
         
         _start = getFrame(target, start);
@@ -89,7 +100,7 @@ class Anim {
                 if (onRepeat != null)
                     onRepeat();
                 _target.removeEventListener(Event.ENTER_FRAME, update);
-                TimeUtils.delay(restart);
+                _replayTimer = TimeUtils.delay(restart);
             }
         } else if (!_target.isPlaying)
             _target.play();
@@ -102,6 +113,8 @@ class Anim {
     }
     
     public function destroy():Void {
+        
+        Actuate.stop(_replayTimer);
         
         _target.removeEventListener(Event.ENTER_FRAME, update);
         _target = null;

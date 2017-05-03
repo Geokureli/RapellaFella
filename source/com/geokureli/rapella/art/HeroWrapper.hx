@@ -2,6 +2,7 @@ package com.geokureli.rapella.art;
 import com.geokureli.rapella.art.Anim.AnimDef;
 import com.geokureli.rapella.art.ScriptedWrapper;
 import com.geokureli.rapella.input.Key;
+import com.geokureli.rapella.utils.SwfUtils;
 import hx.debug.Assert;
 import openfl.display.MovieClip;
 import openfl.geom.Point;
@@ -38,43 +39,43 @@ class HeroWrapper extends ScriptedWrapper {
     var _bottom(get, never):Float;
     
     var _anims:Map<String, AnimDef>;
-    var _currentAnim:AnimDef;
+    var _currentAnim:String;
     
-    public function new(mc:MovieClip) {
-        super(mc);
-        
-        _originalScale = new Point(scaleX, scaleY);
-        _bounds = target.getChildByName('bounds').getBounds(parent);
-        _bounds.x -= x;
-        _bounds.y -= y;
-        _centerMass = new Point(
-            _bounds.x + _bounds.width  / 2,
-            _bounds.y + _bounds.height / 2
-        );
-        
-        Key.bindAll([Key.RIGHT, Key.D], ">");
-        Key.bindAll([Key.LEFT , Key.A], "<");
-        Key.bindAll([Key.DOWN , Key.S], "v");
-        Key.bindAll([Key.UP   , Key.W], "^");
-        Key.bind(Key.SHIFT, "run");
-    }
+    public function new(mc:MovieClip) { super(mc); }
     
     override function setDefaults() {
         super.setDefaults();
         
         isParent = true;
         _anims = [
-            "idle" => new AnimDef("idle"),
-            "walk" => new AnimDef("walk"),
-            "run"  => new AnimDef("run" ),
-            "jump" => new AnimDef("jump")
+            "idle" => AnimDef.createLoop("idle"),
+            "walk" => AnimDef.createLoop("walk"),
+            "run"  => AnimDef.createLoop("run" ),
+            "jump" => AnimDef.create    ("jump", "fall"),
+            "fall" => AnimDef.create    ("fall"),
+            "land" => AnimDef.create    ("land"),
         ];
+        
+        Key.bindAll([Key.RIGHT, Key.D], ">");
+        Key.bindAll([Key.LEFT , Key.A], "<");
+        Key.bindAll([Key.UP   , Key.W, Key.SPACE], "jump");
+        Key.bind(Key.SHIFT, "run");
     }
     
     override function init():Void {
         super.init();
         
         play("idle");
+        
+        _originalScale = new Point(scaleX, scaleY);
+        _bounds = getChild('bounds').getBounds(parent);
+        
+        _bounds.x -= x;
+        _bounds.y -= y;
+        _centerMass = new Point(
+            _bounds.x + _bounds.width  / 2,
+            _bounds.y + _bounds.height / 2
+        );
     }
     
     override public function update():Void {
@@ -112,19 +113,21 @@ class HeroWrapper extends ScriptedWrapper {
         y += vy;
     }
     
-    public function play(animKey:String, reset:Bool = false):Void
+    public function play(animKey:String, reset:Bool = false):Anim
     {
         if (Assert.isTrue(_anims.exists(animKey), 'Missing [animKey=$animKey]')) {
             
-            if (!reset && _currentAnim == _anims[animKey])
-                return;
+            if (!reset && _currentAnim == animKey)
+                return _anims[_currentAnim].activeAnim;
             
             if(_currentAnim != null)
-                _currentAnim.stop();
+                _anims[_currentAnim].stop();
             
-            _currentAnim = _anims[animKey];
-            _currentAnim.loop(_clip);
+            _currentAnim = animKey;
+            return _anims[_currentAnim].play(_clip);
         }
+        
+        return null;
     }
     
     function get__left  ():Float { return target.x + _bounds.left  ; }
