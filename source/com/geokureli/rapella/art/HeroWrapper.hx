@@ -1,6 +1,7 @@
 package com.geokureli.rapella.art;
 import com.geokureli.rapella.art.Anim.AnimDef;
 import com.geokureli.rapella.art.ScriptedWrapper;
+import com.geokureli.rapella.debug.Debug;
 import com.geokureli.rapella.input.Key;
 import com.geokureli.rapella.utils.SwfUtils;
 import hx.debug.Assert;
@@ -68,7 +69,9 @@ class HeroWrapper extends ScriptedWrapper {
         play("idle");
         
         _originalScale = new Point(scaleX, scaleY);
-        _bounds = getChild('bounds').getBounds(parent);
+        var boundsMc:MovieClip = getChild('bounds');
+        boundsMc.visible = Debug.showBounds;
+        _bounds = boundsMc.getBounds(parent);
         
         _bounds.x -= x;
         _bounds.y -= y;
