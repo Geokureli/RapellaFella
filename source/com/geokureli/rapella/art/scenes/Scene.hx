@@ -60,7 +60,7 @@ class Scene extends ScriptedWrapper {
         }
     }
     
-    override function init() {
+    override function init():Void {
         super.init();
         
         var cameraBoundsMC:MovieClip = SwfUtils.get(target, 'cameraBounds');

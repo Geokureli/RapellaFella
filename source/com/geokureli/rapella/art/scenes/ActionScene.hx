@@ -24,7 +24,7 @@ class ActionScene extends Scene {
     
     public function new(symbolId:String, data:Dynamic) { super(symbolId, data); }
     
-    override function init() {
+    override function init():Void {
         super.init();
         
         addWrapper(_hero = new HeroWrapper(cast target.getChildByName('hero')));
