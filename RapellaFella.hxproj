@@ -31,7 +31,7 @@
   </classpaths>
   <!-- Build options -->
   <build>
-    <option directives="openfl=4.9.1&#xA;lime=4.0.2&#xA;swf=2.3.1&#xA;signal_stoppable&#xA;signal=1.0.2&#xA;actuate=1.8.7&#xA;tools=4.0.2&#xA;swf-parent-fps&#xA;no-compilation&#xA;openfl-flash&#xA;web&#xA;display" />
+    <option directives="openfl=4.9.1&#xA;lime=4.0.2&#xA;swf=2.3.1&#xA;signal_stoppable&#xA;signal=1.0.2&#xA;actuate=1.8.7&#xA;no-inline&#xA;tools=4.0.2&#xA;swf-parent-fps&#xA;no-compilation&#xA;openfl-flash&#xA;web&#xA;display" />
     <option flashStrict="False" />
     <option noInlineOnDebug="False" />
     <option mainClass="ApplicationMain" />
