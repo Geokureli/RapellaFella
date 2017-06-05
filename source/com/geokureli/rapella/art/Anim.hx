@@ -47,7 +47,7 @@ class AnimDef {
         activeAnim = null;
     }
     
-    static inline public function create    (start:Dynamic, ?end:Dynamic):AnimDef { return new AnimDef(start, end); }
+    static inline public function create    (start:Dynamic, ?end:Dynamic):AnimDef { return new AnimDef(start, end, false); }
     static inline public function createLoop(start:Dynamic, ?end:Dynamic):AnimDef { return new AnimDef(start, end, true); }
 }
 
@@ -89,17 +89,17 @@ class Anim {
         if (_target.currentFrame == _end) {
             
             _target.stop();
+            _target.removeEventListener(Event.ENTER_FRAME, update);
             if (++_repeatCount > repeat && repeat > -1) {
                 
                 if (onComplete != null)
                     onComplete();
-                destroy();
+                //destroy();
             }
             else {
                 
                 if (onRepeat != null)
                     onRepeat();
-                _target.removeEventListener(Event.ENTER_FRAME, update);
                 _replayTimer = TimeUtils.delay(restart);
             }
         } else if (!_target.isPlaying)
