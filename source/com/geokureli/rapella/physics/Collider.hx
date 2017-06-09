@@ -37,6 +37,7 @@ class Collider {
     public var centerY(get, never):Float;
     
     var touching:Int;
+    public var solidSides(default, null):Int;
     
     public function new(mc:Sprite, wrapper:Wrapper = null) {
         
@@ -71,6 +72,10 @@ class Collider {
         if (type == null)
             type = ColliderType.Box;
         
+        solidSides = Direction.Any;
+        if (type == ColliderType.Cloud)
+            solidSides = Direction.Up;
+        
         mc.visible = Debug.showBounds;
     }
     
@@ -98,9 +103,15 @@ class Collider {
     
     inline function resolveCollision(colliders:Array<Collider>):Void {
         
+        var checkSides:Int = Direction.None;
+        if      (velocity.x > 0)   checkSides |= Direction.Left ;
+        else if (velocity.x < 0)   checkSides |= Direction.Right;
+        if      (velocity.y > 0)   checkSides |= Direction.Up   ;
+        else if (velocity.y < 0)   checkSides |= Direction.Down ;
+        
         for (collider in colliders) {
             
-            if (collider == this)
+            if (collider == this || checkSides & collider.solidSides == 0)
                 continue;
             
             if (!collider.moves) {
@@ -122,8 +133,7 @@ class Collider {
                     }
                 }
                 
-                if (//!isTouching(Direction.Down)// TODO: remove? &&
-                left  + velocity.x < collider.right
+                if (left  + velocity.x < collider.right
                 &&  right + velocity.x > collider.left
                 &&  (  (top    > collider.bottom && top    + velocity.y < collider.bottom)
                     || (bottom < collider.top    && bottom + velocity.y > collider.top   ))) {
@@ -150,11 +160,17 @@ class Collider {
         
         var overlap:Point = new Point();
         
+        var checkSides:Int = Direction.None;
+        if      (velocity.x > 0)   checkSides |= Direction.Left ;
+        else if (velocity.x < 0)   checkSides |= Direction.Right;
+        if      (velocity.y > 0)   checkSides |= Direction.Up   ;
+        else if (velocity.y < 0)   checkSides |= Direction.Down ;
+        
         touching = Direction.None;
         
         for (collider in colliders) {
             
-            if (collider == this)
+            if (collider == this || checkSides & collider.solidSides == 0)
                 continue;
             
             if (!collider.moves) {
@@ -164,11 +180,21 @@ class Collider {
                 &&  left   < collider.right
                 &&  right  > collider.left) {
                     
-                    overlap.x = collider.right - left;
-                    overlap.y = collider.bottom - top;
+                    overlap.x = 0;
+                    if (collider.solidSides & Direction.X > 0) {
+                        
+                        overlap.x = collider.right - left;
+                        if (overlap.x > (collider.width  + width ) / 2)
+                            overlap.x -= collider.width  + width ;
+                    }
                     
-                    if (overlap.x > (collider.width  + width ) / 2) overlap.x -= collider.width  + width ;
-                    if (overlap.y > (collider.height + height) / 2) overlap.y -= collider.height + height;
+                    overlap.y = 0;
+                    if (collider.solidSides & Direction.Y > 0) {
+                        
+                        overlap.y = collider.bottom - top;
+                        if (overlap.y > (collider.height + height) / 2)
+                            overlap.y -= collider.height + height;
+                    }
                     
                     // --- MOVE ALONG THE AXIS WITH THE LEAST OVERLAP
                     if (Math.abs(overlap.x) < Math.abs(overlap.y))
@@ -216,8 +242,10 @@ class Direction {
     public static inline var Right  :Int = 0x0010;
     public static inline var Up     :Int = 0x0100;
     public static inline var Down   :Int = 0x1000;
-    public static inline var Any    :Int = 0x1111;
-    public static inline var Ceiling:Int = 0x0100;
-    public static inline var Floor  :Int = 0x1000;
-    public static inline var Wall   :Int = 0x0011;
+    public static inline var Any    :Int = Left | Right | Up | Down;
+    public static inline var X      :Int = Left | Right;
+    public static inline var Y      :Int = Up | Down;
+    public static inline var Wall   :Int = X;
+    public static inline var Ceiling:Int = Up;
+    public static inline var Floor  :Int = Down;
 }
