@@ -11,11 +11,11 @@
     />
     
     <set name="SWF_VERSION" value="11.5"/>
+    <set name="openfl-legacy" />
     
     <app path="export"/>
     
     <classpath name="source" />
-    <classpath path="../lib/Hi-ReS-Stats/src" />
     <classpath path="../lib/HxAssert/src" />
     <classpath path="../lib/openfl" />
     <!--<classpath path="../lib/HxBitmapAnim/src" />-->
@@ -28,6 +28,7 @@
     <haxelib name="actuate" />
     
     <haxedef name="swf-parent-fps" />
+    <haxedef name="no-inline" if="debug" />
     <define name="defaultNonEmbed" if="windows || neko" />
     <define name="embedAssets" unless="debug flash" />
     

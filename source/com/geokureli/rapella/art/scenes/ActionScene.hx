@@ -1,6 +1,7 @@
 package com.geokureli.rapella.art.scenes;
 
 import com.geokureli.rapella.art.HeroWrapper;
+import com.geokureli.rapella.debug.Debug;
 import com.geokureli.rapella.utils.SwfUtils;
 import openfl.display.MovieClip;
 import openfl.display.Shape;
@@ -24,7 +25,7 @@ class ActionScene extends Scene {
     
     public function new(symbolId:String, data:Dynamic) { super(symbolId, data); }
     
-    override function init() {
+    override function init():Void {
         super.init();
         
         addWrapper(_hero = new HeroWrapper(cast target.getChildByName('hero')));
@@ -38,6 +39,8 @@ class ActionScene extends Scene {
             light.gotoAndStop("on");
         
         _hero.walls = SwfUtils.getAll(target, 'wall', new Array<MovieClip>());
+        for (wall in _hero.walls)
+            wall.visible = Debug.showBounds;
         
         SwfUtils.getMC(target, 'well').gotoAndStop("echoOpen");
         //SwfUtils.get(_target, 'bg').cacheAsBitmap = true;

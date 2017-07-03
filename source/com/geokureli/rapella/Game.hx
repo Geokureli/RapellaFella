@@ -20,9 +20,10 @@ import openfl.events.Event;
 
 class Game extends Sprite {
     
+    static inline public var FPS:Float = 30.0;
+    static inline public var SPF:Float = 1 / FPS;
+    
     static public var mainStage(default, null):Stage;
-    static public var fps(default, null):Float;
-    static public var spf(default, null):Float;
     static public var currentScene(default, null):Scene;
     static public var instance(default, null):Game;
     
@@ -51,8 +52,6 @@ class Game extends Sprite {
         removeEventListener(Event.ADDED_TO_STAGE, init);
         
         mainStage = stage;
-        fps = stage.frameRate;
-        spf = 1 / fps;
         _sceneMap = [
             "action" => ActionScene
         ];

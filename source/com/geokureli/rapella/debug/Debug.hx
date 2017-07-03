@@ -18,6 +18,7 @@ class Debug {
     static public var verboseScriptLog  :Bool    = false;
     static public var assertThrow       :Bool    = false;
     static public var showInvalidOptions:Bool    = false;
+    static public var showBounds        :Bool    = false;
     
     static public function init():Void {
         
@@ -26,12 +27,14 @@ class Debug {
             assertThrow = true;
             
             var data:Dynamic = Json.parse(AssetManager.getText("assets/data/Debug.json"));
+            var value:Dynamic;
             for (fieldName in Reflect.fields(data)) {
                 
-                if (Std.is(Reflect.field(Debug, fieldName), Bool))
-                    Reflect.setField(Debug, fieldName, Reflect.field(data, fieldName) == "true");
+                value = Reflect.field(data, fieldName);
+                if (Std.is(Reflect.field(Debug, fieldName), Bool) && Std.is(value, String))
+                    Reflect.setField(Debug, fieldName, value == "true");
                 else
-                    Reflect.setField(Debug, fieldName, Reflect.field(data, fieldName));
+                    Reflect.setField(Debug, fieldName, value);
             }
         #end
         
