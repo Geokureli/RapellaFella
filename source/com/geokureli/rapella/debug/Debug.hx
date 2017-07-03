@@ -19,6 +19,7 @@ class Debug {
     static public var assertThrow       :Bool    = false;
     static public var showInvalidOptions:Bool    = false;
     static public var showBounds        :Bool    = false;
+    static public var airAccel          :Bool    = true;
     
     static public function init():Void {
         

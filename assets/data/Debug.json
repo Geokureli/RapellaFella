@@ -3,5 +3,6 @@
     "showBounds":true,
     "scriptVars":{
         "stat":"charisma"
-    }
+    },
+    "airAccel":true
 }

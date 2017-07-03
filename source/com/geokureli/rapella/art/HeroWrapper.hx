@@ -23,8 +23,9 @@ class HeroWrapper extends ScriptedWrapper {
     static inline var JUMP_VELOCITY:Float = 2 * JUMP_HEIGHT / JUMP_APEX_TIME;
     static inline var GRAVITY:Float = -2 * JUMP_HEIGHT / (JUMP_APEX_TIME * JUMP_APEX_TIME);
     
-    static var WALK_SPEED:Point = new Point(10, 10);
-    static var RUN_SPEED :Point = new Point(20, 20);
+    static var WALK_SPEED:Float = 10;
+    static var RUN_SPEED :Float = 20;
+    static var AIR_ACCEL :Float = 2;
     
     // --- JUMP
     var _jumpHeight  :Float;
@@ -86,12 +87,23 @@ class HeroWrapper extends ScriptedWrapper {
                 scaleX = _collider.velocity.x;
             
             _running = Key.checkAction("run");
-            _collider.velocity.x *= _running ? RUN_SPEED.x : WALK_SPEED.x;
+            _collider.velocity.x *= _running ? RUN_SPEED : WALK_SPEED;
             
             if (Key.checkAction("jump")) {
                 _collider.velocity.y += JUMP_VELOCITY * _originalScale.y;
                 play("jump");
             }
+        } else {
+            
+            _collider.velocity.x += ((Key.checkAction(">") ? 1 : 0) - (Key.checkAction("<") ? 1 : 0)) 
+                * _originalScale.x * AIR_ACCEL;
+            
+            var speed:Float = _running ? RUN_SPEED : WALK_SPEED;
+            
+            if (_collider.velocity.x > speed)
+                _collider.velocity.x = speed;
+            else if (_collider.velocity.x < -speed)
+                _collider.velocity.x = -speed;
         }
         
         super.updatePhysics(colliders);
