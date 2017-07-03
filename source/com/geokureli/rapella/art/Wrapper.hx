@@ -1,5 +1,6 @@
 package com.geokureli.rapella.art;
 
+import com.geokureli.rapella.physics.Collider;
 import com.geokureli.rapella.utils.ChildMap;
 import com.geokureli.rapella.utils.SwfUtils;
 import flash.display.DisplayObject;
@@ -58,6 +59,9 @@ class Wrapper extends Sprite
     var _childMapper:ChildMap;
     var _children:Array<DisplayObject>;
     
+    var _collider(default, null):Collider;
+    public var moves(default, null):Bool;
+    
     public function new(target:DisplayObjectContainer) {
         super();
         
@@ -82,7 +86,9 @@ class Wrapper extends Sprite
             return;
         
         this.target = target;
-        isParent = isParent || target.parent == null;
+        
+        var boundsMc:MovieClip = getChild('bounds');
+        isParent = isParent || boundsMc != null || target.parent == null;
         
         if (isParent) {
             
@@ -98,6 +104,9 @@ class Wrapper extends Sprite
             
             addChild(target);
         }
+        
+        if (boundsMc != null)
+            _collider = new Collider(boundsMc, this);
         
         mapChildren();
         if (_childMapper.mapSuccessful) {
@@ -152,6 +161,17 @@ class Wrapper extends Sprite
            if (child.enabled)
                child.update();
         }
+    }
+    
+    public function updatePhysics(colliders:Array<Collider>):Void {
+        
+        _collider.position.x = x;
+        _collider.position.y = y;
+        
+        _collider.update(colliders);
+        
+        x = _collider.position.x;
+        y = _collider.position.y;
     }
     
     public function addWrapper(child:Wrapper):Wrapper {

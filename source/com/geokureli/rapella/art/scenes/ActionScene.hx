@@ -1,7 +1,9 @@
 package com.geokureli.rapella.art.scenes;
 
 import com.geokureli.rapella.art.HeroWrapper;
+import com.geokureli.rapella.art.Wrapper;
 import com.geokureli.rapella.debug.Debug;
+import com.geokureli.rapella.physics.Collider;
 import com.geokureli.rapella.utils.SwfUtils;
 import openfl.display.MovieClip;
 import openfl.display.Shape;
@@ -19,6 +21,7 @@ class ActionScene extends Scene {
     var _hero:HeroWrapper;
     var _cameraFollowZone:Rectangle;
     var _showReticle:Bool;
+    var _wallData:Array<Collider>;
     
     /** Reusable point for shit */
     var _pt:Point;
@@ -28,19 +31,24 @@ class ActionScene extends Scene {
     override function init():Void {
         super.init();
         
+        var walls:Array<MovieClip> = new Array<MovieClip>();
+        SwfUtils.getAll(target, 'wall' , walls);
+        SwfUtils.getAll(target, 'cloud', walls);
+        SwfUtils.getAll(target, 'ramp' , walls);
+        
+        _wallData = new Array<Collider>();
+        for (wall in walls)
+            _wallData.push(new Collider(wall));
+        
         addWrapper(_hero = new HeroWrapper(cast target.getChildByName('hero')));
         _pt = new Point();
         
         addChild(_reticle = new Reticle())
-        .visible = _showReticle;
+            .visible = _showReticle;
         
         var lights:Array<MovieClip> = SwfUtils.getAll(target, 'light', new Array<MovieClip>());
         for (light in lights)
             light.gotoAndStop("on");
-        
-        _hero.walls = SwfUtils.getAll(target, 'wall', new Array<MovieClip>());
-        for (wall in _hero.walls)
-            wall.visible = Debug.showBounds;
         
         SwfUtils.getMC(target, 'well').gotoAndStop("echoOpen");
         //SwfUtils.get(_target, 'bg').cacheAsBitmap = true;
@@ -64,6 +72,13 @@ class ActionScene extends Scene {
     }
     
     override public function update():Void {
+        
+        for (child in _childWrappers) {
+            
+           if (child.enabled && child.moves)
+               child.updatePhysics(_wallData);
+        }
+        
         super.update();
         
         if (_cameraFollowZone != null)
@@ -94,6 +109,14 @@ class ActionScene extends Scene {
         
         Game.camera.centerX = _hero.x;
         Game.camera.centerY = _hero.y;
+    }
+    
+    override public function addWrapper(child:Wrapper):Wrapper {
+        
+        if (child != null && child._collider != null && _wallData.indexOf(child._collider) == -1)
+            _wallData.push(child._collider);
+        
+        return super.addWrapper(child);
     }
 }
 
