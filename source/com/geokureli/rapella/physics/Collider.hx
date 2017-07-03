@@ -109,14 +109,18 @@ class Collider {
         if      (velocity.y > 0)   checkSides |= Direction.Up   ;
         else if (velocity.y < 0)   checkSides |= Direction.Down ;
         
+        var sides:Int;
+        
         for (collider in colliders) {
             
-            if (collider == this || checkSides & collider.solidSides == 0)
+            sides = checkSides & collider.solidSides;
+            if (collider == this || sides == 0)
                 continue;
             
             if (!collider.moves) {
                 
-                if (top    < collider.bottom
+                if (sides & Direction.X > 0
+                &&  top    < collider.bottom
                 &&  bottom > collider.top
                 &&  (  (left  > collider.right && left  + velocity.x < collider.right)
                     || (right < collider.left  && right + velocity.x > collider.left ))) {
@@ -133,7 +137,8 @@ class Collider {
                     }
                 }
                 
-                if (left  + velocity.x < collider.right
+                if (sides & Direction.Y > 0
+                &&  left  + velocity.x < collider.right
                 &&  right + velocity.x > collider.left
                 &&  (  (top    > collider.bottom && top    + velocity.y < collider.bottom)
                     || (bottom < collider.top    && bottom + velocity.y > collider.top   ))) {
@@ -160,17 +165,21 @@ class Collider {
         
         var overlap:Point = new Point();
         
-        var checkSides:Int = Direction.None;
-        if      (velocity.x > 0)   checkSides |= Direction.Left ;
-        else if (velocity.x < 0)   checkSides |= Direction.Right;
-        if      (velocity.y > 0)   checkSides |= Direction.Up   ;
-        else if (velocity.y < 0)   checkSides |= Direction.Down ;
+        var velSides:Int = Direction.None;
+        if      (velocity.x > 0) velSides |= Direction.Left ;
+        else if (velocity.x < 0) velSides |= Direction.Right;
+        if      (velocity.y > 0) velSides |= Direction.Up   ;
+        else if (velocity.y < 0) velSides |= Direction.Down ;
         
         touching = Direction.None;
+        var checkSides:Int;
+        var overlapSides:Int;
+        var bufferSides:Int;
         
         for (collider in colliders) {
             
-            if (collider == this || checkSides & collider.solidSides == 0)
+            checkSides = velSides & collider.solidSides;
+            if (collider == this || checkSides == 0)
                 continue;
             
             if (!collider.moves) {
@@ -181,7 +190,7 @@ class Collider {
                 &&  right  > collider.left) {
                     
                     overlap.x = 0;
-                    if (collider.solidSides & Direction.X > 0) {
+                    if (checkSides & Direction.X > 0) {
                         
                         overlap.x = collider.right - left;
                         if (overlap.x > (collider.width  + width ) / 2)
@@ -189,7 +198,7 @@ class Collider {
                     }
                     
                     overlap.y = 0;
-                    if (collider.solidSides & Direction.Y > 0) {
+                    if (checkSides & Direction.Y > 0) {
                         
                         overlap.y = collider.bottom - top;
                         if (overlap.y > (collider.height + height) / 2)
@@ -203,13 +212,38 @@ class Collider {
                         position.y += overlap.y;
                 }
                 
-                if (isTouching(Direction.Down)
-                  ||(  top    < collider.bottom
-                    && bottom + BUFFER * 2 >= collider.top
-                    && left   < collider.right
-                    && right  > collider.left)) {
+                overlapSides
+                    = (top    <= collider.bottom ? Direction.Up    : 0)
+                    | (bottom >= collider.top    ? Direction.Down  : 0)
+                    | (left   <= collider.right  ? Direction.Left  : 0)
+                    | (right  >= collider.left   ? Direction.Right : 0);
+                
+                
+                bufferSides
+                    = (top    - BUFFER * 2 <= collider.bottom ? Direction.Up    : 0)
+                    | (bottom + BUFFER * 2 >= collider.top    ? Direction.Down  : 0)
+                    | (left   - BUFFER * 2 <= collider.right  ? Direction.Left  : 0)
+                    | (right  + BUFFER * 2 >= collider.left   ? Direction.Right : 0);
+                
+                if (bufferSides == Direction.Any) {
                     
-                    touching |= Direction.Down;
+                    bufferSides ^= overlapSides;
+                    
+                    if ( overlapSides & ~Direction.Down > 0
+                      && bufferSides  &  Direction.Down > 0)
+                        touching |= Direction.Down;
+                    
+                    if ( overlapSides & ~Direction.Up > 0
+                      && bufferSides  &  Direction.Up > 0)
+                        touching |= Direction.Up;
+                    
+                    if ( overlapSides & ~Direction.Left > 0
+                      && bufferSides  &  Direction.Left > 0)
+                        touching |= Direction.Left;
+                    
+                    if ( overlapSides & ~Direction.Right > 0
+                      && bufferSides  &  Direction.Right > 0)
+                        touching |= Direction.Right;
                 }
             }
         }
