@@ -39,6 +39,7 @@ class HeroWrapper extends ScriptedWrapper {
     var _keyShift:Bool;
     
     var _originalScale:Point;
+    var _originalPos:Point;
     public var centerMassX(get, never):Float;
     public var centerMassY(get, never):Float;
     
@@ -75,10 +76,22 @@ class HeroWrapper extends ScriptedWrapper {
         play("idle");
         
         _originalScale = new Point(scaleX, scaleY);
+        _originalPos = new Point(x, y);
         _collider.acceleration.y = GRAVITY * _originalScale.y;
     }
     
     override public function updatePhysics(colliders:Array<Collider>):Void {
+        
+        #if debug
+        if (Key.isDown(Key.R)) {
+            
+            x = _originalPos.x;
+            y = _originalPos.y;
+            scaleX = _originalScale.x;
+            _collider.velocity.x = 0;
+            _collider.velocity.y = 0;
+        }
+        #end
         
         if (_collider.isTouching(Direction.Down)) {
             
