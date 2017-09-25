@@ -1,8 +1,9 @@
 package com.geokureli.rapella.debug;
 
+import com.geokureli.rapella.utils.SwfUtils;
 import openfl.filters.GlowFilter;
 import hx.event.Signal;
-import openfl.text.TextField;
+import openfl.text.*;
 import flash.display.Sprite;
 
 class DebugConsole extends Sprite{
@@ -21,12 +22,16 @@ class DebugConsole extends Sprite{
         onForceShow = new Signal<Bool>();
         
         addChild(_output = new TextField());
+        var format:TextFormat = _output.defaultTextFormat;
+        format.font = "Arial";
+        format.color = 0xFFFFFF;
+        _output.defaultTextFormat = format;
         
         _output.x = DebugStats.GRAPH_WIDTH;
         _output.width = Game.mainStage.stageWidth - DebugStats.GRAPH_WIDTH;
         _output.height = 200;
         
-        filters = [ new GlowFilter(0xFFFFFF, 1, 2, 2, 8, 1) ];
+        filters = [ new GlowFilter(0, 1, 2, 2, 8, 1) ];
         
         SwfUtils.mouseDisableAll(this);
     }
