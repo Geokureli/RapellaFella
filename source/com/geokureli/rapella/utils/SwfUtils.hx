@@ -1,9 +1,7 @@
 package com.geokureli.rapella.utils;
 
 import hx.debug.Assert;
-import openfl.display.DisplayObjectContainer;
-import openfl.display.DisplayObject;
-import openfl.display.MovieClip;
+import openfl.display.*;
 import openfl.geom.Point;
 import openfl.geom.Rectangle;
 
@@ -128,5 +126,55 @@ class SwfUtils {
         child.scaleX = rect.width;
         child.scaleY = rect.height;
         return child;
+    }
+    
+    inline static public function mouseDisableAll(target:DisplayObjectContainer):Void {
+        
+        if (Assert.nonNull(target)) {
+            
+            target.mouseEnabled = false;
+            unsafe_mouseDisableAll(target);
+        }
+    }
+    
+    static private function unsafe_mouseDisableAll(target:DisplayObjectContainer):Void {
+        
+        var child:DisplayObject;
+        for (i in 0 ... target.numChildren) {
+            
+            child = cast(target.getChildAt(i), DisplayObject);
+            if (Std.is(child, InteractiveObject)) {
+                
+                cast(child, InteractiveObject).mouseEnabled = false;
+                if (Std.is(child, DisplayObjectContainer))
+                    unsafe_mouseDisableAll(cast child);
+            }
+        }
+    }
+    
+    inline static public function getHierarchyName(child:DisplayObject):String {
+        
+        var name = getChildName(child);
+        while (child.parent != null && child.parent != child.stage && !Std.is(child.parent, Game)) {
+            
+            child = child.parent;
+            name = getChildName(child) + "." + name;
+        }
+        
+        return name;
+    }
+    
+    inline static private function getChildName(child:DisplayObject):String {
+        
+        var name = child.name;
+        if (name.indexOf("instance") == 0) {
+            
+            name = name
+            .split("instance")
+            .join(Type.getClassName(Type.getClass(child)))
+            .split(".")
+            .pop();
+        }
+        return name;
     }
 }
