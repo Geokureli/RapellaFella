@@ -5,7 +5,6 @@ import com.geokureli.rapella.debug.DebugConsole;
 import hx.debug.Assert;
 import com.geokureli.rapella.script.ScriptInterpreter;
 import com.geokureli.rapella.art.scenes.ActionScene;
-import flash.display.Stage;
 import com.geokureli.rapella.art.AssetManager;
 import com.geokureli.rapella.debug.Debug;
 import com.geokureli.rapella.art.scenes.Scene;
@@ -15,7 +14,7 @@ import com.geokureli.rapella.debug.DebugOverlay;
 import com.geokureli.rapella.input.Key;
 import motion.Actuate;
 import motion.easing.Linear;
-import openfl.display.Sprite;
+import openfl.display.*;
 import openfl.events.Event;
 
 class Game extends Sprite {
@@ -39,6 +38,7 @@ class Game extends Sprite {
         
         super ();
         
+        name = "Game";
         instance = this;
         
         if (stage != null)
@@ -52,9 +52,9 @@ class Game extends Sprite {
         removeEventListener(Event.ADDED_TO_STAGE, init);
         
         mainStage = stage;
-        _sceneMap = [
-            "action" => ActionScene
-        ];
+        _sceneMap = 
+            [ "action" => ActionScene
+            ];
         
         _actionMap = new ActionMap(this);
         _actionMap.add("gotoScene" , script_gotoScene , ["id", "?label"]);
@@ -95,7 +95,7 @@ class Game extends Sprite {
     inline function initManagers():Void {
         
         // entry point
-        Debug.init();
+        Debug.init(stage);
         AssetManager.init();
         Key.init(stage);
         Actuate.defaultEase = Linear.easeNone;

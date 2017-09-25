@@ -16,6 +16,7 @@ class DebugConsole extends Sprite{
     public function new() {
         super();
         
+        name = "DebugConsole";
         _instance = this;
         onForceShow = new Signal<Bool>();
         
@@ -26,6 +27,8 @@ class DebugConsole extends Sprite{
         _output.height = 200;
         
         filters = [ new GlowFilter(0xFFFFFF, 1, 2, 2, 8, 1) ];
+        
+        SwfUtils.mouseDisableAll(this);
     }
     
     public function addLog(msg:String, forceShow:Bool = false):Void {

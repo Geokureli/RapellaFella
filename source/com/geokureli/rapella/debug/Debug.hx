@@ -1,5 +1,10 @@
 package com.geokureli.rapella.debug;
 
+import com.geokureli.rapella.utils.SwfUtils;
+import flash.filters.BitmapFilter;
+import flash.filters.GlowFilter;
+import openfl.events.MouseEvent;
+import openfl.display.*;
 import com.geokureli.rapella.art.AssetManager;
 import hx.debug.Expect;
 import haxe.PosInfos;
@@ -20,8 +25,13 @@ class Debug {
     static public var showInvalidOptions:Bool    = false;
     static public var showBounds        :Bool    = false;
     static public var airAccel          :Bool    = true;
+    static public var trackClicks       :Bool    = false;
     
-    static public function init():Void {
+    
+    static private var _lastClick:DisplayObject;
+    static private var _clickGlow:GlowFilter;
+    
+    static public function init(stage:Stage):Void {
         
         #if debug
             startingScene = "Scene1";
@@ -36,6 +46,12 @@ class Debug {
                     Reflect.setField(Debug, fieldName, value == "true");
                 else
                     Reflect.setField(Debug, fieldName, value);
+            }
+            
+            if (trackClicks){
+                
+                _clickGlow = new GlowFilter(0x00FF00, 1, 2, 2, 8, 1);
+                stage.addEventListener(MouseEvent.CLICK, onClickAnything);
             }
         #end
         
@@ -78,4 +94,25 @@ class Debug {
             trace('${pos.fileName}[${pos.lineNumber}]: $msg');
         #end
     }
+    
+#if debug
+    static private function onClickAnything(e:MouseEvent):Void {
+        
+        var target:DisplayObject = e.target;
+        var filters:Array<BitmapFilter>;
+        if (_lastClick != null) {
+            filters = _lastClick.filters;
+            filters.pop();
+            _lastClick.filters = filters;
+        }
+        
+        _lastClick = target;
+        filters = target.filters;
+        filters.push(_clickGlow);
+        target.filters = filters;
+        
+        
+        DebugConsole.log('Clicked: ${SwfUtils.getHierarchyName(target)}');
+    }
+#end
 }
