@@ -1,8 +1,7 @@
-{
-    "startingScene":"Scene4",
-    "showBounds":true,
-    "scriptVars":{
-        "stat":"charisma"
-    },
-    "airAccel":true
+{ "startingScene":"Scene4"
+, "showBounds"   :true
+, "scriptVars"
+:   { "stat":"charisma"
+    }
+, "airAccel"     :true
 }
