@@ -53,10 +53,14 @@ class Debug {
                 _clickGlow = new GlowFilter(0x00FF00, 1, 2, 2, 8, 1);
                 stage.addEventListener(MouseEvent.CLICK, onClickAnything);
             }
+            
+            trace("debug enabled");
         #end
         
         Assert.fail = handleAssertFail;
         Expect.fail = handleExpectFail;
+        
+        trace("assert/expect enabled");
     }
     
     static function handleAssertFail(?msg:String, ?pos:PosInfos):Void {
