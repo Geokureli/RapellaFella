@@ -7,7 +7,7 @@ import openfl.display.DisplayObject;
 import openfl.display.DisplayObjectContainer;
 import haxe.PosInfos;
 import hx.debug.AssertLogger;
-import hx.event.Signal;
+import lime.app.Event;
 
 typedef ChildDef = { field:String, ?priority:ChildPriority, ?caster:Dynamic->Dynamic }
 
@@ -19,7 +19,7 @@ class ChildMap {
     @unreflective public var sortChildren:Bool;
     
     @:unreflective var _map:Map<String, Dynamic>;
-    @:unreflective var _onFail:Signal<String>;
+    @:unreflective var _onFail:Event<String->Void>;
     @:unreflective var _failListeners:Int;
     @:unreflective var _priorityMap:Map<ChildPriority, AssertLogger>;
     @:unreflective var _mapLog:String;
@@ -33,7 +33,7 @@ class ChildMap {
     
     function setDefaults():Void {
         
-        _onFail = new Signal<String>();
+        _onFail = new Event<String->Void>();
         _failListeners = 0;
         
         _priorityMap = [
@@ -51,7 +51,7 @@ class ChildMap {
     
     public function removeStrictFailListener(listener:String->Void):Void {
         
-        if (_onFail.get(listener) != null)
+        if (_onFail.has(listener))
             _failListeners++;
         
         _onFail.remove(listener);

@@ -61,6 +61,7 @@ class Game extends Sprite {
         _actionMap.add("nextScene" , script_nextScene , ["?label"      ]);
         _actionMap.add("error"     , script_error     , ["...msg"      ]);
         _actionMap.add("log"       , script_log       , ["...msg"      ]);
+        _actionMap.add("breakpoint", script_breakpoint, ["...msg"      ]);
         _actionMap.add("checkpoint", script_checkpoint);
         
         #if !embedAssets
@@ -153,6 +154,19 @@ class Game extends Sprite {
     function script_error(msg:Array<String>):Void {
         
         Assert.fail(msg.join(", "));
+    }
+    
+    function script_breakpoint(msg:Array<String>):Void {
+        
+        if (msg.length == 0)
+            msg.push("Breakpoint");
+        else if (msg[0] == null)
+            msg[0] = "Breakpoint";
+        else
+            msg[0] = "Breakpoint: " + msg[0];
+        
+        script_log(msg);
+        var putBreakpointHere = true;
     }
     
     function script_checkpoint(msg:Array<String>):Void {

@@ -2,18 +2,18 @@
 <project>
     
     <app
-        title="Rapella Fella"
-        file="RapellaFella"
-        main="com.geokureli.rapella.Game"
-        package="com.geokureli.rapella"
-        version="1.0.0"
-        company="GeoKureli"
+        title   ="Rapella Fella"
+        file    ="RapellaFella"
+        main    ="com.geokureli.rapella.Game"
+        package ="com.geokureli.rapella"
+        version ="1.0.0"
+        company ="GeoKureli"
+        path    ="bin/release"
     />
+    <app path="bin" if="debug" />
     
     <set name="SWF_VERSION" value="11.5"/>
-    <set name="openfl-legacy" />
-    
-    <app path="export"/>
+    <!-- <set name="openfl-legacy" /> -->
     
     <classpath name="source" />
     <classpath path="../lib/HxAssert/src" />
@@ -24,7 +24,6 @@
     
     <haxelib name="openfl" />
     <haxelib name="swf" />
-    <haxelib name="signal" />
     <haxelib name="actuate" />
     
     <haxedef name="swf-parent-fps" />

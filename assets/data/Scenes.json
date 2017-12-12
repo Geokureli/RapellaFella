@@ -55,6 +55,20 @@
         }
     },
     "Scene4": {
-        "type":"action"
+        "type"  :"action",
+        "assets": {
+            "lightRay"  : { "init": "lightRay.gotoAndStop(on)" },
+            "wallSwitch": {
+                "init" : "vars.lightsOn = true",
+                "touch":"game.log(touch)",
+                "use": [
+                    { "if"  : "vars.lightsOn"
+                    , "then": [ "lightRay.gotoAndStop(off)", "vars.lightsOn = false" ]
+                    , "else": [ "lightRay.gotoAndStop(on)" , "vars.lightsOn = true"  ]
+                    }
+                ]
+            },
+            "well":{ "init": "well.gotoAndStop(open)" }
+        }
     }
 }

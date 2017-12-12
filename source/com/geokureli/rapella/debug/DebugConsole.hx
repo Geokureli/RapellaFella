@@ -2,7 +2,7 @@ package com.geokureli.rapella.debug;
 
 import com.geokureli.rapella.utils.SwfUtils;
 import openfl.filters.GlowFilter;
-import hx.event.Signal;
+import lime.app.Event;
 import openfl.text.*;
 import flash.display.Sprite;
 
@@ -10,7 +10,7 @@ class DebugConsole extends Sprite{
     
     static var _instance:DebugConsole;
     
-    public var onForceShow(default, null):Signal<Bool>;
+    public var onForceShow(default, null):Event<Bool->Void>;
     
     var _output:TextField;
     
@@ -19,7 +19,7 @@ class DebugConsole extends Sprite{
         
         name = "DebugConsole";
         _instance = this;
-        onForceShow = new Signal<Bool>();
+        onForceShow = new Event<Bool->Void>();
         
         addChild(_output = new TextField());
         var format:TextFormat = _output.defaultTextFormat;

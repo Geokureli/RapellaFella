@@ -29,6 +29,11 @@ class ActionScene extends Scene {
     public function new(symbolId:String, data:Dynamic) { super(symbolId, data); }
     
     override function init():Void {
+        
+        SwfUtils.mouseDisableAll(target);
+        
+        _wallData = new Array<Collider>();
+        
         super.init();
         
         var walls:Array<MovieClip> = new Array<MovieClip>();
@@ -36,7 +41,6 @@ class ActionScene extends Scene {
         SwfUtils.getAll(target, 'cloud', walls);
         SwfUtils.getAll(target, 'ramp' , walls);
         
-        _wallData = new Array<Collider>();
         for (wall in walls)
             _wallData.push(new Collider(wall));
         
@@ -50,7 +54,6 @@ class ActionScene extends Scene {
         for (light in lights)
             light.gotoAndStop("on");
         
-        SwfUtils.getMC(target, 'well').gotoAndStop("echoOpen");
         //SwfUtils.get(_target, 'bg').cacheAsBitmap = true;
     }
     
@@ -71,11 +74,29 @@ class ActionScene extends Scene {
         );
     }
     
+    override function initAssets():Void {
+        
+        super.initAssets();
+        
+        for (asset in _assets) {
+            
+            asset.click.add(onAssetClick.bind(asset));
+        }
+    }
+    
+    function onAssetClick(asset:ScriptedWrapper):Void
+    {
+        if(_hero.canUse(asset))
+            asset.use.dispatch();
+    }
+    
     override public function update():Void {
         
         for (child in _childWrappers) {
             
-           if (child.enabled && child.moves)
+           if (child.enabled
+           &&  child.collider != null
+           &&  (child.collider.moves || child.collider.trackTouches))
                child.updatePhysics(_wallData);
         }
         
@@ -113,8 +134,8 @@ class ActionScene extends Scene {
     
     override public function addWrapper(child:Wrapper):Wrapper {
         
-        if (child != null && child._collider != null && _wallData.indexOf(child._collider) == -1)
-            _wallData.push(child._collider);
+        if (child != null && child.collider != null && _wallData.indexOf(child.collider) == -1)
+            _wallData.push(child.collider);
         
         return super.addWrapper(child);
     }

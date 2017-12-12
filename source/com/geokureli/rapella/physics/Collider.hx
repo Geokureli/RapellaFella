@@ -1,9 +1,10 @@
 package com.geokureli.rapella.physics;
 
+import hx.debug.Assert;
+import lime.app.Event;
 import com.geokureli.rapella.art.Wrapper;
-import com.geokureli.rapella.art.scenes.Scene;
 import com.geokureli.rapella.debug.Debug;
-import com.geokureli.rapella.physics.Collider.ColliderType;
+import com.geokureli.rapella.physics.ColliderType;
 import openfl.display.DisplayObjectContainer;
 import openfl.display.Sprite;
 import openfl.geom.Rectangle;
@@ -17,7 +18,8 @@ class Collider {
     
     static inline var BUFFER:Float = 0.1;
     
-    public var type  (default, null):ColliderType;
+    public var type (default, null):ColliderType;
+    public var asset(default, null):Wrapper;
     
     var _bounds(default, null):Rectangle;
     public var left  (get, never):Float;
@@ -26,7 +28,8 @@ class Collider {
     public var bottom(get, never):Float;
     public var width (get, never):Float;
     public var height(get, never):Float;
-    public var moves (default, null):Bool;
+    
+    public var moves:Bool;
     
     public var position    (default, null):Point;
     public var velocity    (default, null):Point;
@@ -36,72 +39,140 @@ class Collider {
     public var centerX(get, never):Float;
     public var centerY(get, never):Float;
     
-    var touching:Int;
-    public var solidSides(default, null):Int;
+    var _touchingDir:Int;
+    var _touching:Array<Collider>;
+    var _onTouch   :Map<Wrapper, Event<Void->Void>>;
+    var _onSeparate:Map<Wrapper, Event<Void->Void>>;
+    public var trackTouches:Bool;
+    public var solidSides(default, default):Int;
+    public var isSolid(get, null):Bool;
     
-    public function new(mc:Sprite, wrapper:Wrapper = null) {
+    public var onDestroy(default, null):Event<Void->Void>;
+    
+    public function new(boundsMc:Sprite, wrapper:Wrapper = null) {
+        
+        Assert.isTrue(boundsMc != null || wrapper != null, "cannot handle null boundsMc and wrapper");
+        asset = wrapper;
         
         position     = new Point();
         velocity     = new Point();
         acceleration = new Point();
         
-        var parent:DisplayObjectContainer = mc.parent;
-        if (wrapper != null) {
-            
-            moves = wrapper.moves;
-            parent = wrapper.parent;
-        }
+        onDestroy   = new Event<Void->Void>();
+        _onTouch    = new Map<Wrapper, Event<Void->Void>>();
+        _onSeparate = new Map<Wrapper, Event<Void->Void>>();
         
-        _bounds = mc.getBounds(parent);
+        _touching = [];
+        
+        if (wrapper != null && (boundsMc == null || boundsMc == wrapper) && Std.is(wrapper.target, Sprite))
+            boundsMc = cast wrapper.target;
+
+        var parent:DisplayObjectContainer;
+        if (wrapper != null)
+            parent = wrapper.parent;
+        else
+            parent = boundsMc.parent;
+        
+        _bounds = boundsMc.getBounds(parent);
         if (wrapper != null) {
             
             _bounds.x -= wrapper.x;
             _bounds.y -= wrapper.y;
         }
-            
-        //_bounds.x *= mc.scaleX;
-        //_bounds.y *= mc.scaleY;
-        //_bounds.width  *= mc.scaleX;
-        //_bounds.height *= mc.scaleY;
+        
+        //_bounds.x *= boundsMc.scaleX;
+        //_bounds.y *= boundsMc.scaleY;
+        //_bounds.width  *= boundsMc.scaleX;
+        //_bounds.height *= boundsMc.scaleY;
         _center = new Point(
             _bounds.x + _bounds.width  / 2,
             _bounds.y + _bounds.height / 2
         );
         
-        type = cast mc.name;
-        if (type == null)
+        if (boundsMc.name == cast ColliderType.Cloud)
+            type = ColliderType.Cloud;
+        else if (boundsMc.name == cast ColliderType.Ramp)
+            type = ColliderType.Ramp;
+        else
             type = ColliderType.Box;
+        
+        if (wrapper == null || boundsMc.name == "bounds")
+            boundsMc.visible = Debug.showBounds;
         
         solidSides = Direction.Any;
         if (type == ColliderType.Cloud)
             solidSides = Direction.Up;
-        
-        mc.visible = Debug.showBounds;
+    }
+    
+    public function isTouching(asset:Wrapper):Bool
+    {
+        return _touching.indexOf(asset.collider) != -1;
     }
     
     public function update(colliders:Array<Collider>):Void {
         
-        if (!isTouching(acceleration.x > 0 ? Direction.Right : Direction.Left))
-            velocity.x += acceleration.x / 2;
+        var nowTouching:Array<Collider> = null;
+        if (trackTouches)
+            nowTouching = new Array<Collider>();
         
-        if (!isTouching(acceleration.y > 0 ? Direction.Down : Direction.Up))
-            velocity.y += acceleration.y / 2;
+        if (moves) {
+            // --- START ACCELORATION, SINCE d = (Vi + Vf) / 2 * t 
+            halfAccel();
+            // --- CHECK IF MOVEMENT IS POSSIBLE, TRIM VELOCITY IF NOT
+            resolveCollision(colliders, nowTouching);
+            // --- MOVE
+            position.x += velocity.x;
+            position.y += velocity.y;
+            // --- FINISH ACCELORATION
+            halfAccel();
+            // --- REDUNDANT OVERLAP CHECK FOR SAFETY
+            resolveOverlap(colliders);
+        }
         
-        resolveCollision(colliders);
-        
-        position.x += velocity.x;
-        position.y += velocity.y;
-        
-        if (!isTouching(acceleration.x > 0 ? Direction.Right : Direction.Left))
-            velocity.x += acceleration.x / 2;
-        
-        if (!isTouching(acceleration.y > 0 ? Direction.Down : Direction.Up))
-            velocity.y += acceleration.y / 2;
-        
-        resolveOverlap(colliders);
+        if (trackTouches) {
+            
+            getAllOverlapping(colliders, nowTouching);
+            
+            var i = _touching.length;
+            while (i-- > 0) {
+                
+                if (nowTouching.indexOf(_touching[i]) == -1) {
+                    // --- STOP TOUCHING
+                    if (_touching[i].asset != null) {
+                        
+                        if (_onSeparate.exists(_touching[i].asset))
+                            _onSeparate[_touching[i].asset].dispatch();
+                        
+                        trace('touching ${_touching[i].asset.name}');
+                    }
+                    _touching.splice(i, 1);
+                }
+                else
+                    // --- STILL TOUCHING
+                    nowTouching.remove(_touching[i]);
+            }
+            
+            while (nowTouching.length > 0) {
+                // --- START TOUCHING
+                if (nowTouching[0].asset != null) {
+                    
+                    if (_onTouch.exists(nowTouching[0].asset))
+                        _onTouch[nowTouching[0].asset].dispatch();
+                    
+                    trace('touching ${nowTouching[0].asset.name}');
+                }
+                _touching.push(nowTouching.shift());
+            }
+        }
     }
     
-    inline function resolveCollision(colliders:Array<Collider>):Void {
+    inline function halfAccel():Void
+    {
+        if (!isTouchingDir(acceleration.x > 0 ? Direction.Right : Direction.Left)) velocity.x += acceleration.x / 2;
+        if (!isTouchingDir(acceleration.y > 0 ? Direction.Down  : Direction.Up  )) velocity.y += acceleration.y / 2;
+    }
+    
+    inline function resolveCollision(colliders:Array<Collider>, touched:Array<Collider>):Void {
         
         var checkSides:Int = Direction.None;
         if      (velocity.x > 0)   checkSides |= Direction.Left ;
@@ -110,12 +181,15 @@ class Collider {
         else if (velocity.y < 0)   checkSides |= Direction.Down ;
         
         var sides:Int;
+        var isTouching:Bool;
         
         for (collider in colliders) {
             
             sides = checkSides & collider.solidSides;
             if (collider == this || sides == 0)
                 continue;
+            
+            isTouching = false;
             
             if (!collider.moves) {
                 
@@ -125,14 +199,15 @@ class Collider {
                 &&  (  (left  > collider.right && left  + velocity.x < collider.right)
                     || (right < collider.left  && right + velocity.x > collider.left ))) {
                     
+                    isTouching = true;
                     if (velocity.x > 0) {
                         
-                        touching |= Direction.Right;
+                        _touchingDir |= Direction.Right;
                         velocity.x = collider.left  - right - BUFFER;
                         
                     } else {
                         
-                        touching |= Direction.Left;
+                        _touchingDir |= Direction.Left;
                         velocity.x = collider.right - left + BUFFER;
                     }
                 }
@@ -143,14 +218,15 @@ class Collider {
                 &&  (  (top    > collider.bottom && top    + velocity.y < collider.bottom)
                     || (bottom < collider.top    && bottom + velocity.y > collider.top   ))) {
                     
+                    isTouching = true;
                     if (velocity.y > 0) {
                         
-                        touching |= Direction.Down;
+                        _touchingDir |= Direction.Down;
                         velocity.y = collider.top - bottom - BUFFER;
                         
                     } else {
                         
-                        touching |= Direction.Up;
+                        _touchingDir |= Direction.Up;
                         velocity.y = collider.bottom - top + BUFFER;
                     }
                 }
@@ -158,7 +234,30 @@ class Collider {
                 
                 //TODO: 2 Moving bodies
             }
+            
+            if (touched != null && isTouching)
+                touched.push(collider);
         }
+    }
+    
+    inline function getAllOverlapping(colliders:Array<Collider>, touched:Array<Collider>):Void {
+        
+        for (collider in colliders) {
+            
+            if (isOverlapping(collider))
+                touched.push(collider);
+        }
+    }
+    
+    public function isOverlapping(collider:Collider):Bool {
+        // --- BOX ONLY FOR NOW
+        return  (  (left <= collider.left   && right  >= collider.left  )
+                || (left <= collider.right  && right  >= collider.right )
+                )
+            &&  (  (top >= collider.top    && bottom <= collider.top   )
+                || (top >= collider.bottom && bottom <= collider.bottom)
+                )
+            ;
     }
     
     inline function resolveOverlap(colliders:Array<Collider>):Void {
@@ -171,7 +270,7 @@ class Collider {
         if      (velocity.y > 0) velSides |= Direction.Up   ;
         else if (velocity.y < 0) velSides |= Direction.Down ;
         
-        touching = Direction.None;
+        _touchingDir = Direction.None;
         var checkSides:Int;
         var overlapSides:Int;
         var bufferSides:Int;
@@ -231,25 +330,43 @@ class Collider {
                     
                     if ( overlapSides & ~Direction.Down > 0
                       && bufferSides  &  Direction.Down > 0)
-                        touching |= Direction.Down;
+                        _touchingDir |= Direction.Down;
                     
                     if ( overlapSides & ~Direction.Up > 0
                       && bufferSides  &  Direction.Up > 0)
-                        touching |= Direction.Up;
+                        _touchingDir |= Direction.Up;
                     
                     if ( overlapSides & ~Direction.Left > 0
                       && bufferSides  &  Direction.Left > 0)
-                        touching |= Direction.Left;
+                        _touchingDir |= Direction.Left;
                     
                     if ( overlapSides & ~Direction.Right > 0
                       && bufferSides  &  Direction.Right > 0)
-                        touching |= Direction.Right;
+                        _touchingDir |= Direction.Right;
                 }
             }
         }
     }
     
-    inline public function isTouching(direction:Int):Bool { return touching & direction > 0; }
+    public function destroy():Void
+    {
+        position     = null;
+        velocity     = null;
+        acceleration = null;
+        
+        type = null;
+        
+        _bounds = null;
+        _center = null;
+        
+        _touching   = null;
+        _onTouch    = null;
+        _onSeparate = null;
+        
+        onDestroy.dispatch();
+    }
+    
+    inline public function isTouchingDir(direction:Int):Bool { return _touchingDir & direction > 0; }
     
     public function get_left  ():Float { return position.x + _bounds.left  ; }
     public function get_right ():Float { return position.x + _bounds.right ; }
@@ -260,13 +377,8 @@ class Collider {
     
     public function get_centerX():Float { return position.x + _center.x; }
     public function get_centerY():Float { return position.y + _center.y; }
-}
-
-@:enum
-abstract ColliderType(String) {
-    var Box   = "box";
-    var Ramp  = "ramp";
-    var Cloud = "cloud";
+    
+    public function get_isSolid():Bool { return solidSides > 0; }
 }
 
 @:enum

@@ -1,6 +1,6 @@
 package com.geokureli.rapella.input;
 
-import hx.event.Signal;
+import lime.app.Event;
 import openfl.display.Stage;
 import openfl.events.KeyboardEvent;
 
@@ -12,7 +12,7 @@ class Key {
     
     static var _stage:Stage;
     static var _states:Map<Int, Bool>;
-    static var _listeners:Map<Int, Signal<Bool->Void>>;
+    static var _listeners:Map<Int, Event<Bool->Void>>;
     static var _actions:Map<String, Int>;
     static var _binds:Map<Int, Array<String>>;
     
@@ -20,7 +20,7 @@ class Key {
         
        _stage = stage;
        _states    = new Map<Int, Bool>();
-       _listeners = new Map<Int, Signal<Bool->Void>>();
+       _listeners = new Map<Int, Event<Bool->Void>>();
        _actions   = new Map<String, Int>();
        _binds     = new Map<Int, Array<String>>();
         
@@ -79,7 +79,7 @@ class Key {
     inline static public function listen(key:Int, func:Bool->Void, ?once:Bool):Void {
         
        if (!_listeners.exists(key))
-           _listeners[key] = new Signal<Bool->Void>();
+           _listeners[key] = new Event<Bool->Void>();
         
        _listeners[key].add(func, once);
     }

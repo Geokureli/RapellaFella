@@ -2,11 +2,13 @@ package com.geokureli.rapella.art;
 
 import com.geokureli.rapella.functional.MultiListener;
 import com.geokureli.rapella.utils.TimeUtils;
-import openfl.Assets.AssetType;
+import openfl.utils.AssetType;
 import openfl.Assets;
 import com.geokureli.rapella.debug.Debug;
 import openfl.display.MovieClip;
 import lime.utils.AssetLibrary;
+import lime.app.Future;
+
 class AssetManager {
     
     static var _scenes:Map<String, String>;
@@ -16,16 +18,19 @@ class AssetManager {
     
     static public function initDebugAssets(callback:Void->Void):Void {
         
-        _debugAssets = [
+        _debugAssets = new Map<String, Dynamic>();
+        var loaderFuncs:Map<String, String->Dynamic> = [
             "assets/data/Debug.json"  => Assets.loadText,
             "assets/data/Scenes.json" => Assets.loadText
         ];
         
         var listener = new MultiListener(callback);
-		TimeUtils.delay(listener.createListener("wait"));
-        for (path in _debugAssets.keys()) {
+        TimeUtils.delay(listener.createListener("wait"));
+        
+        for (path in loaderFuncs.keys()) {
             
-            _debugAssets[path](path, handleAssetLoad.bind(_, path, listener.createListener(path)));
+            _debugAssets[path] = loaderFuncs[path](path)
+                .onComplete(handleAssetLoad.bind(_, path, listener.createListener(path)));
         }
     }
     
@@ -58,7 +63,7 @@ class AssetManager {
         var library:AssetLibrary;
         do {
             
-            library = lime.Assets.getLibrary('library$l');
+            library = lime.utils.Assets.getLibrary('library$l');
             if (library != null) {
                 
                 do {
