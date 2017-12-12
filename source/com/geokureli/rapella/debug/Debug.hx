@@ -1,5 +1,6 @@
 package com.geokureli.rapella.debug;
 
+import com.geokureli.rapella.art.ui.UIColors;
 import com.geokureli.rapella.utils.SwfUtils;
 import flash.filters.BitmapFilter;
 import flash.filters.GlowFilter;
@@ -50,7 +51,7 @@ class Debug {
             
             if (trackClicks){
                 
-                _clickGlow = new GlowFilter(0x00FF00, 1, 2, 2, 8, 1);
+                _clickGlow = UIColors.GLOW_DEBUG_CLICK;
                 stage.addEventListener(MouseEvent.CLICK, onClickAnything);
             }
             

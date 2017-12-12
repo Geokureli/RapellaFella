@@ -11,7 +11,7 @@ import openfl.geom.Rectangle;
  */
 class SwfUtils {
     
-    static var _arrayToken:EReg = ~/\[(\d?)\]/;
+    static var _arrayToken:EReg = ~/\[(\d*)\]/;
     
     @:generic
     inline static public function getAll<T:DisplayObject>(parent:DisplayObjectContainer, path:String, ?list:Array<T>):Array<T> {

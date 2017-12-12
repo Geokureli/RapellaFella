@@ -1,5 +1,8 @@
 package com.geokureli.rapella.art.scenes;
 
+import Reflect;
+import openfl.display.DisplayObject;
+import hx.debug.Assert;
 import com.geokureli.rapella.art.ui.DeathMenu;
 import com.geokureli.rapella.art.ui.MenuWrapper;
 import com.geokureli.rapella.utils.FuncUtils;
@@ -26,6 +29,9 @@ class Scene extends ScriptedWrapper {
     var _labels:Map<String, FrameData>;
     var _data:Dynamic;
     
+    var _assetMap:Map<String, Class<ScriptedWrapper>>;
+    var _assets:Map<String, ScriptedWrapper>;
+    
     public function new(name:String, data:Dynamic, startingLabel:Dynamic = null) {
         
         _data = data;
@@ -38,11 +44,17 @@ class Scene extends ScriptedWrapper {
         if (asset.totalFrames > 1)
             asset.gotoAndPlay(startingLabel);
         
+        asset.name = "scene";
         super(asset);
     }
     
     override function setDefaults() {
         super.setDefaults();
+        
+        _assets = new Map<String, ScriptedWrapper>();
+        _assetMap = 
+            [ "hero" => HeroWrapper
+            ];
         
         _scriptId = "scene";
         isParent = true;
@@ -63,8 +75,15 @@ class Scene extends ScriptedWrapper {
     override function init():Void {
         super.init();
         
+        initCamera();
+        initAssets();
+        initLabels();
+    }
+    
+    function initCamera() {
+        
         var cameraBoundsMC:MovieClip = SwfUtils.get(target, 'cameraBounds');
-        if (cameraBoundsMC != null){ 
+        if (cameraBoundsMC != null){
             
             _cameraBounds = cameraBoundsMC.getBounds(target);
             target.removeChild(cameraBoundsMC);
@@ -77,22 +96,6 @@ class Scene extends ScriptedWrapper {
             //_cameraBounds.y = -_cameraBounds.height / 2;
         }
         
-        initCamera();
-        
-        _interactables = SwfUtils.getAll(target, 'interactable');
-        for (interactable in _interactables) {
-            
-            interactable.useHandCursor = true;
-            interactable.mouseEnabled  = true;
-            interactable.mouseChildren = true;
-            interactable.addEventListener(MouseEvent.CLICK, onInteract);
-        }
-        
-        initLabels();
-    }
-    
-    function initCamera() {
-        
         // --- CAMERA BOUNDS CAN'T BE SMALLER THAN THE LEVEL
         if (_cameraBounds.width  < Game.mainStage.stageWidth)
             _cameraBounds.width  = Game.mainStage.stageWidth;
@@ -103,19 +106,60 @@ class Scene extends ScriptedWrapper {
         Game.camera.drawTarget = this;
     }
     
-    function initLabels():Void
-    {
-        var labelData:Dynamic = {};
-        if(_data != null && Reflect.hasField(_data, "labels"))
-            labelData = Reflect.field(_data, "labels");
+    function initAssets():Void {
         
-        for(frame in _clip.currentLabels)
-            _labels[frame.name] = new FrameData(_clip, frame, Reflect.field(labelData, frame.name));
-        
-        for (frame in _labels) {
+        _interactables = SwfUtils.getAll(target, 'interactable');
+        for (interactable in _interactables) {
             
-            if (frame.isEnd && Expect.isTrue(_labels.exists(frame.beginLabel), 'found [label="${frame.name}"] without a matching "${frame.beginLabel}"'))
-                _labels[frame.beginLabel].endFrame = frame;
+            interactable.useHandCursor = true;
+            interactable.mouseEnabled  = true;
+            interactable.mouseChildren = true;
+            interactable.addEventListener(MouseEvent.CLICK, onInteract);
+        }
+        
+        var assetData:Dynamic = {};
+        if(_data != null && Reflect.hasField(_data, "assets")) {
+            
+            assetData = Reflect.field(_data, "assets");
+            
+            var assetClass:Class<ScriptedWrapper>;
+            var type:String;
+            var child:DisplayObject;
+            var data:Dynamic;
+            for (assetName in Reflect.fields(assetData)) {
+                
+                data = Reflect.field(assetData, assetName);
+                type = Reflect.field(data, "type");
+                assetClass = ScriptedWrapper;
+                if (type != null && Assert.isTrue(_assetMap.exists(type), 'Invalid [type="$type"]'))
+                    assetClass = _assetMap[type];
+                
+                child = target.getChildByName(assetName);
+                if (child != null)
+                    _assets[assetName] = cast addWrapper(Type.createInstance(assetClass, [child]));
+            }
+            
+            // --- ONCE ALL ASSETS ARE CREATED, INIT THEM
+            for (assetName in _assets.keys())
+                _assets[assetName].parseData(Reflect.field(assetData, assetName));
+        }
+    }
+    
+    function initLabels():Void {
+        
+        var labelData:Dynamic = {};
+        if(_data != null && Reflect.hasField(_data, "labels")) {
+            
+            labelData = Reflect.field(_data, "labels");
+            
+            for(frame in _clip.currentLabels)
+                _labels[frame.name] = new FrameData(_clip, frame, Reflect.field(labelData, frame.name));
+            
+            for (frame in _labels) {
+                
+                if (frame.isEnd && Expect.isTrue(_labels.exists(frame.beginLabel), 'found [label="${frame.name}"] without a matching "${frame.beginLabel}"'))
+                    _labels[frame.beginLabel].endFrame = frame;
+            }
         }
     }
     
@@ -141,7 +185,11 @@ class Scene extends ScriptedWrapper {
         for (label in _labels)
             label.destroy();
         
+        for (asset in _assets)
+            asset.destroy();
+        
         _labels = null;
+        _assets = null;
     }
 }
 
@@ -206,10 +254,10 @@ class FrameData {
         
         var ui = initMenu(DeathMenu);
         if (ui != null)
-            ui.onClick.add(handleRestartClick);
+            ui.click.add(onRestartClick);
     }
     
-    function handleRestartClick():Void {
+    function onRestartClick():Void {
         
         _target.gotoAndPlay(1);
     }
