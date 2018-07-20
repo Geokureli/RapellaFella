@@ -49,7 +49,7 @@ class ScriptedWrapper extends Wrapper {
         _fieldMap =
             [ "init"  => addListenerAction.bind(parse)
             , "click" => addClickAction
-            , "use"   => addClickAction//addListenerAction.bind(use  )
+            , "use"   => addListenerAction.bind(use  )
             , "touch" => addListenerAction.bind(touch)
             , "leave" => addListenerAction.bind(leave)
             ];

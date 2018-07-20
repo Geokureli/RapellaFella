@@ -1,5 +1,5 @@
 { "startingScene":"Scene4"
-, "showBounds"   :false
+, "showBounds"   :true
 , "scriptVars"
 :   { "stat":"charisma"
     }

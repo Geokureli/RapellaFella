@@ -1,7 +1,5 @@
 package com.geokureli.rapella.art.ui;
 
-import flash.filters.BitmapFilter;
-import openfl.display.DisplayObject;
 import flash.filters.GlowFilter;
 
 class UIColors {
