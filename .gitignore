@@ -1,5 +1,6 @@
 # Build and Release Folders
 export/
+bin/
 .idea/
 RECOVER*.fla
 # Project files, i.e. `.project`, `.actionScriptProperties` and `.flexProperties`

@@ -1,14 +1,12 @@
 package com.geokureli.rapella.art;
+
 import com.geokureli.rapella.art.Anim.AnimDef;
 import com.geokureli.rapella.art.ScriptedWrapper;
-import com.geokureli.rapella.debug.Debug;
 import com.geokureli.rapella.input.Key;
 import com.geokureli.rapella.physics.Collider;
-import com.geokureli.rapella.utils.SwfUtils;
 import hx.debug.Assert;
 import openfl.display.MovieClip;
 import openfl.geom.Point;
-import openfl.geom.Rectangle;
 
 /**
  * ...
@@ -53,8 +51,6 @@ class HeroWrapper extends ScriptedWrapper {
     override function setDefaults() {
         super.setDefaults();
         
-        moves = true;
-        
         _anims = [
             "idle" => AnimDef.createLoop("idle"),
             "walk" => AnimDef.createLoop("walk"),
@@ -77,7 +73,14 @@ class HeroWrapper extends ScriptedWrapper {
         
         _originalScale = new Point(scaleX, scaleY);
         _originalPos = new Point(x, y);
-        _collider.acceleration.y = GRAVITY * _originalScale.y;
+        collider.acceleration.y = GRAVITY * _originalScale.y;
+    }
+    
+    override function initCollider(boundsMc:MovieClip):Void {
+        super.initCollider(boundsMc);
+        
+        collider.moves = true;
+        collider.trackTouches = true;
     }
     
     override public function updatePhysics(colliders:Array<Collider>):Void {
@@ -88,35 +91,35 @@ class HeroWrapper extends ScriptedWrapper {
             x = _originalPos.x;
             y = _originalPos.y;
             scaleX = _originalScale.x;
-            _collider.velocity.x = 0;
-            _collider.velocity.y = 0;
+            collider.velocity.x = 0;
+            collider.velocity.y = 0;
         }
         #end
         
-        if (_collider.isTouching(Direction.Down)) {
+        if (collider.isTouchingDir(Direction.Down)) {
             
-            _collider.velocity.x = ((Key.checkAction(">") ? 1 : 0) - (Key.checkAction("<") ? 1 : 0)) * _originalScale.x;
-            if(_collider.velocity.x != 0)
-                scaleX = _collider.velocity.x;
+            collider.velocity.x = ((Key.checkAction(">") ? 1 : 0) - (Key.checkAction("<") ? 1 : 0)) * _originalScale.x;
+            if(collider.velocity.x != 0)
+                scaleX = collider.velocity.x;
             
             _running = Key.checkAction("run");
-            _collider.velocity.x *= _running ? RUN_SPEED : WALK_SPEED;
+            collider.velocity.x *= _running ? RUN_SPEED : WALK_SPEED;
             
             if (Key.checkAction("jump")) {
-                _collider.velocity.y += JUMP_VELOCITY * _originalScale.y;
+                collider.velocity.y += JUMP_VELOCITY * _originalScale.y;
                 play("jump");
             }
         } else {
             
-            _collider.velocity.x += ((Key.checkAction(">") ? 1 : 0) - (Key.checkAction("<") ? 1 : 0)) 
+            collider.velocity.x += ((Key.checkAction(">") ? 1 : 0) - (Key.checkAction("<") ? 1 : 0)) 
                 * _originalScale.x * AIR_ACCEL;
             
             var speed:Float = _running ? RUN_SPEED : WALK_SPEED;
             
-            if (_collider.velocity.x > speed)
-                _collider.velocity.x = speed;
-            else if (_collider.velocity.x < -speed)
-                _collider.velocity.x = -speed;
+            if (collider.velocity.x > speed)
+                collider.velocity.x = speed;
+            else if (collider.velocity.x < -speed)
+                collider.velocity.x = -speed;
         }
         
         super.updatePhysics(colliders);
@@ -130,7 +133,7 @@ class HeroWrapper extends ScriptedWrapper {
     
     inline function updateAnimation():Void {
         
-        if (_collider.isTouching(Direction.Down)) {
+        if (collider.isTouchingDir(Direction.Down)) {
             
             //if (_curentAnim == "jump") {
                 //
@@ -138,7 +141,7 @@ class HeroWrapper extends ScriptedWrapper {
                 //play("land");
                 //
             //} else 
-            if (_collider.velocity.x == 0)
+            if (collider.velocity.x == 0)
                 play("idle");
             else if (_running)
                 play("run");
@@ -168,7 +171,12 @@ class HeroWrapper extends ScriptedWrapper {
         
         return null;
     }
+
+    public function canUse(asset:ScriptedWrapper):Bool
+    {
+        return collider.isTouching(asset);
+    }
     
-    function get_centerMassX():Float { return _collider.centerX; }
-    function get_centerMassY():Float { return _collider.centerY; }
+    function get_centerMassX():Float { return collider.centerX; }
+    function get_centerMassY():Float { return collider.centerY; }
 }

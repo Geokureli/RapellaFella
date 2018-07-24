@@ -1,33 +1,96 @@
 package com.geokureli.rapella.art;
 
+import lime.app.Event;
+
+import openfl.display.Sprite;
+import openfl.display.DisplayObjectContainer;
+import openfl.events.MouseEvent;
+import openfl.filters.BitmapFilter;
+
+import com.geokureli.rapella.art.scenes.Scene;
+import com.geokureli.rapella.art.ui.UIColors;
 import com.geokureli.rapella.script.Action.ActionMap;
 import com.geokureli.rapella.script.ScriptInterpreter;
-import openfl.display.DisplayObjectContainer;
+
+import hx.debug.Assert;
 
 /**
  * ...
  * @author George
  */
 class ScriptedWrapper extends Wrapper {
+
+    public var click(default, null):Event<Void->Void>;
+    public var parse(default, null):Event<Void->Void>;
+    public var use  (default, null):Event<Void->Void>;
     
-   var _scriptId:String;
-   var _actionMap:ActionMap;
+    var _scriptId:String;
+    var _fieldMap:Map<String, Dynamic->ScriptedWrapper->Void>;
+    var _actionMap:ActionMap;
+    var _filters:Array<BitmapFilter>;
     
-   public function new(target:DisplayObjectContainer) { super(target); }
+    public function new(target:DisplayObjectContainer) { super(target); }
     
-   override function setDefaults() {
+    override function setDefaults() {
         super.setDefaults();
         
+        click = new Event<Void->Void>();
+        parse = new Event<Void->Void>();
+        use   = new Event<Void->Void>();
+        
         _actionMap = new ActionMap(this);
-        _actionMap.add("goto"      , script_goto      , ["label"        ]);
-        _actionMap.add("playFromTo", script_playFromTo, ["start", "?end"], true);
-        _actionMap.add("playTo"    , script_playTo    , ["start"        ], true);
-        _actionMap.add("play"      , script_play);
-        _actionMap.add("stop"      , script_stop);
+        _actionMap.add("goto"       , script_goto       , ["label"        ]);
+        _actionMap.add("gotoAndStop", script_gotoAndStop, ["label"        ]);
+        _actionMap.add("gotoAndPlay", script_gotoAndPlay, ["label"        ]);
+        _actionMap.add("playFromTo" , script_playFromTo , ["start", "?end"], true);
+        _actionMap.add("playTo"     , script_playTo     , ["start"        ], true);
+        _actionMap.add("play"       , script_play);
+        _actionMap.add("stop"       , script_stop);
+        
+        _fieldMap =
+            [ "init"  => addListenerAction.bind(parse)
+            , "click" => addClickAction
+            , "use"   => addUseAction
+            , "touch" => addTouchAction
+            , "leave" => addLeaveAction
+            ];
+    }
+
+    override public function parseData(data:Dynamic, scene:Scene):Void {
+        
+        var target:ScriptedWrapper;
+        var action;
+        var splitIndex;
+        for (field in Reflect.fields(data)) {
+            
+            target = null;
+            action = field;
+            splitIndex = field.indexOf(":");
+            
+            if (splitIndex != -1) {
+                
+                action = field.substr(0, splitIndex);
+                if (splitIndex + 1 < field.length)
+                    target = scene.findAsset(field.substr(splitIndex + 1));
+            }
+            
+            if (_fieldMap.exists(action))
+                _fieldMap[action](Reflect.field(data, field), target);
+        }
+        
+        parse.dispatch();
     }
     
     override function init():Void { 
         super.init();
+        
+        if (target != null) {
+            
+            _filters = target.filters;
+            
+            if (_scriptId == null && target.name.indexOf("instance") != 0)
+                _scriptId = target.name;
+        }
         
         if(_scriptId != null)
             ScriptInterpreter.addInterpreter(_scriptId, _actionMap);
@@ -50,9 +113,91 @@ class ScriptedWrapper extends Wrapper {
     }
     
     // =================================================================================================================
+    //{ region                                              EVENTS
+    // =================================================================================================================
+    
+    function addListenerAction(event:Event<Void->Void>, action:Dynamic, target:ScriptedWrapper):Void {
+        
+        event.add(ScriptInterpreter.run.bind(action));
+    }
+    
+    public function addClickListener(listener:Void->Void):Void {
+        
+        cast (target, Sprite).useHandCursor = true;
+        target.mouseEnabled  = true;
+        target.mouseChildren = true;
+        target.addEventListener(MouseEvent.CLICK     , onClick);
+        target.addEventListener(MouseEvent.MOUSE_OVER, onOverOut);
+        target.addEventListener(MouseEvent.MOUSE_OUT , onOverOut);
+        click.add(listener);
+    }
+    
+    function addTouchAction(action:Dynamic, target:ScriptedWrapper):Void {
+        
+        //TODO: Set or check collider.trackTouches
+        //Notes: be smart about the number the assets sensing touches (either in json or automated here)
+        
+        if (target.collider.onTouch[this] == null)
+            target.collider.onTouch[this] = new Event<Void->Void>();
+        target.collider.onTouch[this].add(ScriptInterpreter.run.bind(action));
+    }
+    
+    function addLeaveAction(action:Dynamic, target:ScriptedWrapper):Void {
+        
+        if (target.collider.onSeparate[this] == null)
+            target.collider.onSeparate[this] = new Event<Void->Void>();
+        target.collider.onSeparate[this].add(ScriptInterpreter.run.bind(action));
+    }
+    
+    function addClickAction(action:Dynamic, target:ScriptedWrapper):Void {
+        
+        addClickListener(ScriptInterpreter.run.bind(action));
+    }
+    
+    function addUseAction(action:Dynamic, target:ScriptedWrapper):Void {
+        
+        addClickListener(target.checkCanUse.bind(action, this));
+    }
+    
+    function checkCanUse(action:Dynamic, target:ScriptedWrapper):Void {
+        
+        if(collider.isTouching(target)) {
+            
+            ScriptInterpreter.run(action);
+            use.dispatch();
+        }
+    }
+    
+    function onClick(e:MouseEvent):Void {
+        
+        click.dispatch();
+    }
+    
+    function onOverOut(e:MouseEvent):Void {
+        
+        if (e.type == MouseEvent.MOUSE_OVER) {
+            
+            if (_filters.indexOf(UIColors.GLOW_CAN_USE) == -1) {
+                
+                _filters.push(UIColors.GLOW_CAN_USE);
+                target.filters = _filters;
+            }
+        } else if (_filters.indexOf(UIColors.GLOW_CAN_USE) != -1) {
+            
+            _filters.remove(UIColors.GLOW_CAN_USE);
+            target.filters = _filters;
+        }
+    }
+    
+    //} endregion                                           EVENTS
+    // =================================================================================================================
+    
+    // =================================================================================================================
     //{ region                                              SCRIPTS
     // =================================================================================================================
     
+    function script_gotoAndStop(label:String):Void { _clip.gotoAndStop(label); }
+    function script_gotoAndPlay(label:String):Void { _clip.gotoAndPlay(label); }
     function script_goto(label:String):Void { _clip.gotoAndPlay(label); }
     function script_play():Void { _clip.play(); }
     function script_stop():Void { _clip.stop(); }

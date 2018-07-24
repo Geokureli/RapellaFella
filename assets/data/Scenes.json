@@ -55,6 +55,22 @@
         }
     },
     "Scene4": {
-        "type":"action"
+        "type"  :"action",
+        "assets": {
+            "lightRay"  : { "init": "lightRay.gotoAndStop(on)" },
+            "light1"    : { "init": "light1.gotoAndStop(on)" },
+            "light2"    : { "init": "light2.gotoAndStop(on)" },
+            "wallSwitch": {
+                "init" : "vars.lightsOn = true",
+                "touch:hero":"game.log(touch Hero<->wallSwitch)",
+                "use:hero": [
+                    { "if"  : "vars.lightsOn"
+                    , "then": [ "lightRay.gotoAndStop(off)", "vars.lightsOn = false" ]
+                    , "else": [ "lightRay.gotoAndStop(on)" , "vars.lightsOn = true"  ]
+                    }
+                ]
+            },
+            "well":{ "init": "well.gotoAndStop(open)" }
+        }
     }
 }

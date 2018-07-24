@@ -7,14 +7,14 @@ import com.geokureli.rapella.utils.SwfUtils;
 import openfl.text.TextField;
 import openfl.display.MovieClip;
 import openfl.events.Event;
-import hx.event.Signal;
+import lime.app.Event;
 import openfl.display.Sprite;
 
 class ChoiceMenu extends MenuWrapper {
     
     static var _statToken:EReg = ~/\[(\w+)\]/i;
     
-    public var onSelect:Signal<String>;
+    public var onSelect:Event<String->Void>;
     
     var _options:Array<Btn>;
     var _texts:Array<TextField>;
@@ -27,7 +27,7 @@ class ChoiceMenu extends MenuWrapper {
         _options = new Array<Btn>();
         _texts   = new Array<TextField>();
         
-        onSelect = new Signal<String>();
+        onSelect = new Event<String->Void>();
         
         #if flash
         _childMap['option[]'] = { field:'_options', caster:Btn.caster };
@@ -127,6 +127,6 @@ class ChoiceMenu extends MenuWrapper {
     override public function destroy():Void {
         super.destroy();
         
-        onSelect.dispose();
+        onSelect = null;
     }
 }

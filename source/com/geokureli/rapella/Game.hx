@@ -5,7 +5,6 @@ import com.geokureli.rapella.debug.DebugConsole;
 import hx.debug.Assert;
 import com.geokureli.rapella.script.ScriptInterpreter;
 import com.geokureli.rapella.art.scenes.ActionScene;
-import flash.display.Stage;
 import com.geokureli.rapella.art.AssetManager;
 import com.geokureli.rapella.debug.Debug;
 import com.geokureli.rapella.art.scenes.Scene;
@@ -15,7 +14,7 @@ import com.geokureli.rapella.debug.DebugOverlay;
 import com.geokureli.rapella.input.Key;
 import motion.Actuate;
 import motion.easing.Linear;
-import openfl.display.Sprite;
+import openfl.display.*;
 import openfl.events.Event;
 
 class Game extends Sprite {
@@ -39,6 +38,7 @@ class Game extends Sprite {
         
         super ();
         
+        name = "Game";
         instance = this;
         
         if (stage != null)
@@ -52,15 +52,16 @@ class Game extends Sprite {
         removeEventListener(Event.ADDED_TO_STAGE, init);
         
         mainStage = stage;
-        _sceneMap = [
-            "action" => ActionScene
-        ];
+        _sceneMap = 
+            [ "action" => ActionScene
+            ];
         
         _actionMap = new ActionMap(this);
         _actionMap.add("gotoScene" , script_gotoScene , ["id", "?label"]);
         _actionMap.add("nextScene" , script_nextScene , ["?label"      ]);
         _actionMap.add("error"     , script_error     , ["...msg"      ]);
         _actionMap.add("log"       , script_log       , ["...msg"      ]);
+        _actionMap.add("breakpoint", script_breakpoint, ["...msg"      ]);
         _actionMap.add("checkpoint", script_checkpoint);
         
         #if !embedAssets
@@ -95,7 +96,7 @@ class Game extends Sprite {
     inline function initManagers():Void {
         
         // entry point
-        Debug.init();
+        Debug.init(stage);
         AssetManager.init();
         Key.init(stage);
         Actuate.defaultEase = Linear.easeNone;
@@ -153,6 +154,19 @@ class Game extends Sprite {
     function script_error(msg:Array<String>):Void {
         
         Assert.fail(msg.join(", "));
+    }
+    
+    function script_breakpoint(msg:Array<String>):Void {
+        
+        if (msg.length == 0)
+            msg.push("Breakpoint");
+        else if (msg[0] == null)
+            msg[0] = "Breakpoint";
+        else
+            msg[0] = "Breakpoint: " + msg[0];
+        
+        script_log(msg);
+        var putBreakpointHere = true;
     }
     
     function script_checkpoint(msg:Array<String>):Void {

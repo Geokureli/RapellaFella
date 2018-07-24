@@ -1,0 +1,19 @@
+{ "nextgenas.sdk.framework": "/Applications/Adobe Flash Builder 4.7/sdks/4.6.0"
+//, "lime.projectFile": "project.xml"
+, "haxe.displayConfigurations":
+    [   [ "bin/flash/haxe/debug.hxml" ]
+    ,   [ "bin/flash/haxe/release.hxml" ]
+    ,   [ "bin/flash/haxe/final.hxml" ]
+    ,   [ "bin/html5/haxe/debug.hxml" ]
+    ,   [ "bin/html5/haxe/release.hxml" ]
+    ,   [ "bin/html5/haxe/final.hxml" ]
+    ,   [ "bin/macos/haxe/debug.hxml" ]
+    ,   [ "bin/macos/haxe/release.hxml" ]
+    ,   [ "bin/macos/haxe/final.hxml" ]
+    ]
+, "haxe.diagnosticsPathFilter": "${workspaceRoot}/source"
+, "search.exclude": 
+    { "test/bin/**/*.hx": true
+    , "bin"             : true
+    }
+}

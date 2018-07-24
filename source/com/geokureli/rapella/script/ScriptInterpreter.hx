@@ -5,13 +5,13 @@ package com.geokureli.rapella.script;
  * @author George
  */
 
+import hx.debug.Expect;
 import com.geokureli.rapella.art.AssetManager;
 import com.geokureli.rapella.debug.DebugConsole;
 import com.geokureli.rapella.script.Action.ActionMap;
 import hx.debug.Assert;
 import haxe.Json;
 import Reflect;
-import openfl.Assets;
 import com.geokureli.rapella.debug.Debug;
 
 class ScriptInterpreter {
@@ -48,6 +48,7 @@ class ScriptInterpreter {
 
     public static function addInterpreter(id:String, interpreter:ActionMap):Void {
         
+        Expect.notExists(_objects, id);
         _objects[id] = interpreter;
     }
 
@@ -113,7 +114,7 @@ class ScriptInterpreter {
             }
         } else if (rawAction != null) {
             
-            if(Reflect.hasField(rawAction, "if") && Assert.isTrue(Reflect.hasField(rawAction, "then"), "missing 'then' case")) {
+            if(Reflect.hasField(rawAction, "if") && Assert.has(rawAction, "then")) {
                 
                 var condition:String = Reflect.field(rawAction, "if");
                 var result:Bool;

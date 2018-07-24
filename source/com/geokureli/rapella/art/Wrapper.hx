@@ -1,14 +1,18 @@
 package com.geokureli.rapella.art;
 
-import com.geokureli.rapella.physics.Collider;
-import com.geokureli.rapella.utils.ChildMap;
-import com.geokureli.rapella.utils.SwfUtils;
 import flash.display.DisplayObject;
-import hx.debug.Assert;
+
 import openfl.display.DisplayObjectContainer;
 import openfl.display.MovieClip;
 import openfl.display.Sprite;
 import openfl.events.Event;
+
+import com.geokureli.rapella.art.scenes.Scene;
+import com.geokureli.rapella.physics.Collider;
+import com.geokureli.rapella.utils.ChildMap;
+import com.geokureli.rapella.utils.SwfUtils;
+
+import hx.debug.Assert;
 
 /**
  * @author George
@@ -59,7 +63,7 @@ class Wrapper extends Sprite
     var _childMapper:ChildMap;
     var _children:Array<DisplayObject>;
     
-    var _collider(default, null):Collider;
+    public var collider(default, null):Collider;
     public var moves(default, null):Bool;
     
     public function new(target:DisplayObjectContainer) {
@@ -105,8 +109,7 @@ class Wrapper extends Sprite
             addChild(target);
         }
         
-        if (boundsMc != null)
-            _collider = new Collider(boundsMc, this);
+        initCollider(boundsMc);
         
         mapChildren();
         if (_childMapper.mapSuccessful) {
@@ -123,15 +126,26 @@ class Wrapper extends Sprite
             abort();
     }
     
+    function initCollider(boundsMc:MovieClip):Void {
+        
+        collider = new Collider(boundsMc, this);
+        collider.solidSides = Direction.None;
+    }
+    
     function mapChildren():Void {
         
         _children = _childMapper.map(this, target);
     }
     
+    public function parseData(data:Dynamic, scene:Scene):Void {
+        
+        
+    }
+    
     function init():Void { }
     
-    function updateEnable():Void 
-    {
+    function updateEnable():Void {
+        
         for (child in _childWrappers)
             child._parentEnabled = enabled;
     }
@@ -165,13 +179,13 @@ class Wrapper extends Sprite
     
     public function updatePhysics(colliders:Array<Collider>):Void {
         
-        _collider.position.x = x;
-        _collider.position.y = y;
+        collider.position.x = x;
+        collider.position.y = y;
         
-        _collider.update(colliders);
+        collider.update(colliders);
         
-        x = _collider.position.x;
-        y = _collider.position.y;
+        x = collider.position.x;
+        y = collider.position.y;
     }
     
     public function addWrapper(child:Wrapper):Wrapper {
