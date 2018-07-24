@@ -50,10 +50,6 @@ class ActionScene extends Scene {
         addChild(_reticle = new Reticle())
             .visible = _showReticle;
         
-        var lights:Array<MovieClip> = SwfUtils.getAll(target, 'light', new Array<MovieClip>());
-        for (light in lights)
-            light.gotoAndStop("on");
-        
         //SwfUtils.get(_target, 'bg').cacheAsBitmap = true;
     }
     

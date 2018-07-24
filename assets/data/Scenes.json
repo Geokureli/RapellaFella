@@ -58,6 +58,8 @@
         "type"  :"action",
         "assets": {
             "lightRay"  : { "init": "lightRay.gotoAndStop(on)" },
+            "light1"    : { "init": "light1.gotoAndStop(on)" },
+            "light2"    : { "init": "light2.gotoAndStop(on)" },
             "wallSwitch": {
                 "init" : "vars.lightsOn = true",
                 "touch":"game.log(touch)",
