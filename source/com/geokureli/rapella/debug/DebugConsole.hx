@@ -45,6 +45,7 @@ class DebugConsole extends Sprite{
         }
         
         _output.appendText('\n$msg');
+        trace(msg);
     }
     
     static public function log(msg:String, forceShow:Bool = false):Void {
