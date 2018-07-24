@@ -1,21 +1,25 @@
 package com.geokureli.rapella.art.scenes;
 
 import Reflect;
-import openfl.display.DisplayObject;
+
 import hx.debug.Assert;
-import com.geokureli.rapella.art.ui.DeathMenu;
-import com.geokureli.rapella.art.ui.MenuWrapper;
-import com.geokureli.rapella.utils.FuncUtils;
-import com.geokureli.rapella.utils.SwfUtils;
-import com.geokureli.rapella.script.ScriptInterpreter;
 import hx.debug.Expect;
-import openfl.events.Event;
+
 import flash.display.FrameLabel;
-import com.geokureli.rapella.art.ui.ChoiceMenu;
+
+import openfl.display.DisplayObject;
 import openfl.display.MovieClip;
 import openfl.display.Sprite;
+import openfl.events.Event;
 import openfl.events.MouseEvent;
 import openfl.geom.Rectangle;
+
+import com.geokureli.rapella.art.ui.ChoiceMenu;
+import com.geokureli.rapella.art.ui.DeathMenu;
+import com.geokureli.rapella.art.ui.MenuWrapper;
+import com.geokureli.rapella.script.ScriptInterpreter;
+import com.geokureli.rapella.utils.FuncUtils;
+import com.geokureli.rapella.utils.SwfUtils;
 
 /**
  * ...
@@ -117,31 +121,46 @@ class Scene extends ScriptedWrapper {
             interactable.addEventListener(MouseEvent.CLICK, onInteract);
         }
         
-        var assetData:Dynamic = {};
-        if(_data != null && Reflect.hasField(_data, "assets")) {
+        createAssets();
+        parseAssetData();
+    }
+    
+    function createAssets():Void {
+        
+        if (_data == null || !Reflect.hasField(_data, "assets"))
+            return;
+        
+        var assetData = Reflect.field(_data, "assets");
+        var assetClass:Class<ScriptedWrapper>;
+        var type:String;
+        var child:DisplayObject;
+        var data:Dynamic;
+        for (assetName in Reflect.fields(assetData)) {
             
-            assetData = Reflect.field(_data, "assets");
+            data = Reflect.field(assetData, assetName);
+            type = Reflect.field(data, "type");
+            assetClass = ScriptedWrapper;
+            if (type != null && Assert.isTrue(_assetMap.exists(type), 'Invalid [type="$type"]'))
+                assetClass = _assetMap[type];
             
-            var assetClass:Class<ScriptedWrapper>;
-            var type:String;
-            var child:DisplayObject;
-            var data:Dynamic;
-            for (assetName in Reflect.fields(assetData)) {
-                
-                data = Reflect.field(assetData, assetName);
-                type = Reflect.field(data, "type");
-                assetClass = ScriptedWrapper;
-                if (type != null && Assert.isTrue(_assetMap.exists(type), 'Invalid [type="$type"]'))
-                    assetClass = _assetMap[type];
-                
-                child = target.getChildByName(assetName);
-                if (child != null)
-                    _assets[assetName] = cast addWrapper(Type.createInstance(assetClass, [child]));
-            }
+            child = target.getChildByName(assetName);
+            if (child != null)
+                _assets[assetName] = cast addWrapper(Type.createInstance(assetClass, [child]));
+        }
+    }
+    
+    function parseAssetData():Void {
+        
+        if (_data == null || !Reflect.hasField(_data, "assets"))
+            return;
+        
+        var assetData = Reflect.field(_data, "assets");
+        
+        // --- ONCE ALL ASSETS ARE CREATED, INIT THEM
+        for (assetName in _assets.keys()) {
             
-            // --- ONCE ALL ASSETS ARE CREATED, INIT THEM
-            for (assetName in _assets.keys())
-                _assets[assetName].parseData(Reflect.field(assetData, assetName));
+            if (Reflect.hasField(assetData, assetName))
+                _assets[assetName].parseData(Reflect.field(assetData, assetName), this);
         }
     }
     
@@ -173,6 +192,11 @@ class Scene extends ScriptedWrapper {
     function onInteract(e:MouseEvent):Void {
         
         //InteractMenu.setTarget(cast e.currentTarget);
+    }
+    
+    inline public function findAsset(name:String):ScriptedWrapper {
+        
+        return _assets[name];
     }
     
     override public function destroy():Void {

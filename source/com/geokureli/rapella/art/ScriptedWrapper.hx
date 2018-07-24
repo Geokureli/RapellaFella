@@ -1,13 +1,18 @@
 package com.geokureli.rapella.art;
 
-import flash.filters.BitmapFilter;
-import com.geokureli.rapella.art.ui.UIColors;
-import openfl.display.Sprite;
-import openfl.events.MouseEvent;
 import lime.app.Event;
+
+import openfl.display.Sprite;
+import openfl.display.DisplayObjectContainer;
+import openfl.events.MouseEvent;
+import openfl.filters.BitmapFilter;
+
+import com.geokureli.rapella.art.scenes.Scene;
+import com.geokureli.rapella.art.ui.UIColors;
 import com.geokureli.rapella.script.Action.ActionMap;
 import com.geokureli.rapella.script.ScriptInterpreter;
-import openfl.display.DisplayObjectContainer;
+
+import hx.debug.Assert;
 
 /**
  * ...
@@ -18,11 +23,9 @@ class ScriptedWrapper extends Wrapper {
     public var click(default, null):Event<Void->Void>;
     public var parse(default, null):Event<Void->Void>;
     public var use  (default, null):Event<Void->Void>;
-    public var touch(default, null):Event<Void->Void>;
-    public var leave(default, null):Event<Void->Void>;
     
     var _scriptId:String;
-    var _fieldMap:Map<String, Dynamic->Void>;
+    var _fieldMap:Map<String, Dynamic->ScriptedWrapper->Void>;
     var _actionMap:ActionMap;
     var _filters:Array<BitmapFilter>;
     
@@ -34,8 +37,6 @@ class ScriptedWrapper extends Wrapper {
         click = new Event<Void->Void>();
         parse = new Event<Void->Void>();
         use   = new Event<Void->Void>();
-        touch = new Event<Void->Void>();
-        leave = new Event<Void->Void>();
         
         _actionMap = new ActionMap(this);
         _actionMap.add("goto"       , script_goto       , ["label"        ]);
@@ -49,18 +50,32 @@ class ScriptedWrapper extends Wrapper {
         _fieldMap =
             [ "init"  => addListenerAction.bind(parse)
             , "click" => addClickAction
-            , "use"   => addListenerAction.bind(use  )
-            , "touch" => addListenerAction.bind(touch)
-            , "leave" => addListenerAction.bind(leave)
+            , "use"   => addUseAction
+            , "touch" => addTouchAction
+            , "leave" => addLeaveAction
             ];
     }
 
-    override public function parseData(data:Dynamic):Void {
+    override public function parseData(data:Dynamic, scene:Scene):Void {
         
+        var target:ScriptedWrapper;
+        var action;
+        var splitIndex;
         for (field in Reflect.fields(data)) {
             
-            if (_fieldMap.exists(field))
-                _fieldMap[field](Reflect.field(data, field));
+            target = null;
+            action = field;
+            splitIndex = field.indexOf(":");
+            
+            if (splitIndex != -1) {
+                
+                action = field.substr(0, splitIndex);
+                if (splitIndex + 1 < field.length)
+                    target = scene.findAsset(field.substr(splitIndex + 1));
+            }
+            
+            if (_fieldMap.exists(action))
+                _fieldMap[action](Reflect.field(data, field), target);
         }
         
         parse.dispatch();
@@ -101,12 +116,12 @@ class ScriptedWrapper extends Wrapper {
     //{ region                                              EVENTS
     // =================================================================================================================
     
-    function addListenerAction(event:Event<Void->Void>, action:Dynamic):Void {
+    function addListenerAction(event:Event<Void->Void>, action:Dynamic, target:ScriptedWrapper):Void {
         
         event.add(ScriptInterpreter.run.bind(action));
     }
     
-    function addClickListener(listener:Void->Void):Void {
+    public function addClickListener(listener:Void->Void):Void {
         
         cast (target, Sprite).useHandCursor = true;
         target.mouseEnabled  = true;
@@ -117,19 +132,40 @@ class ScriptedWrapper extends Wrapper {
         click.add(listener);
     }
     
-    function addClickAction(action:Dynamic):Void {
+    function addTouchAction(action:Dynamic, target:ScriptedWrapper):Void {
+        
+        //TODO: Set or check collider.trackTouches
+        //Notes: be smart about the number the assets sensing touches (either in json or automated here)
+        
+        if (target.collider.onTouch[this] == null)
+            target.collider.onTouch[this] = new Event<Void->Void>();
+        target.collider.onTouch[this].add(ScriptInterpreter.run.bind(action));
+    }
+    
+    function addLeaveAction(action:Dynamic, target:ScriptedWrapper):Void {
+        
+        if (target.collider.onSeparate[this] == null)
+            target.collider.onSeparate[this] = new Event<Void->Void>();
+        target.collider.onSeparate[this].add(ScriptInterpreter.run.bind(action));
+    }
+    
+    function addClickAction(action:Dynamic, target:ScriptedWrapper):Void {
         
         addClickListener(ScriptInterpreter.run.bind(action));
     }
     
-    function addUseAction(action:Dynamic, targetName:String):Void {
+    function addUseAction(action:Dynamic, target:ScriptedWrapper):Void {
         
-        addClickListener(checkCanUse.bind(action, targetName));
+        addClickListener(target.checkCanUse.bind(action, this));
     }
     
-    function checkCanUse(action:Dynamic, targetName:String):Void->Void {
+    function checkCanUse(action:Dynamic, target:ScriptedWrapper):Void {
         
-        return null;
+        if(collider.isTouching(target)) {
+            
+            ScriptInterpreter.run(action);
+            use.dispatch();
+        }
     }
     
     function onClick(e:MouseEvent):Void {

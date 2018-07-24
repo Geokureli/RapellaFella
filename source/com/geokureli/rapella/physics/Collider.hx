@@ -41,8 +41,8 @@ class Collider {
     
     var _touchingDir:Int;
     var _touching:Array<Collider>;
-    var _onTouch   :Map<Wrapper, Event<Void->Void>>;
-    var _onSeparate:Map<Wrapper, Event<Void->Void>>;
+    public var onTouch   :Map<Wrapper, Event<Void->Void>>;
+    public var onSeparate:Map<Wrapper, Event<Void->Void>>;
     public var trackTouches:Bool;
     public var solidSides(default, default):Int;
     public var isSolid(get, null):Bool;
@@ -59,8 +59,8 @@ class Collider {
         acceleration = new Point();
         
         onDestroy   = new Event<Void->Void>();
-        _onTouch    = new Map<Wrapper, Event<Void->Void>>();
-        _onSeparate = new Map<Wrapper, Event<Void->Void>>();
+        onTouch    = new Map<Wrapper, Event<Void->Void>>();
+        onSeparate = new Map<Wrapper, Event<Void->Void>>();
         
         _touching = [];
         
@@ -68,7 +68,7 @@ class Collider {
             boundsMc = cast wrapper.target;
 
         var parent:DisplayObjectContainer;
-        if (wrapper != null)
+        if (wrapper != null && wrapper.parent != null)
             parent = wrapper.parent;
         else
             parent = boundsMc.parent;
@@ -109,6 +109,17 @@ class Collider {
         return _touching.indexOf(asset.collider) != -1;
     }
     
+    public function isTouchingName(name:String):Bool
+    {
+        for(collider in _touching) {
+            
+            if (collider.asset.target != null && collider.asset.target.name == name)
+                return true;
+        }
+        
+        return false;
+    }
+    
     public function update(colliders:Array<Collider>):Void {
         
         var nowTouching:Array<Collider> = null;
@@ -140,10 +151,10 @@ class Collider {
                     // --- STOP TOUCHING
                     if (_touching[i].asset != null) {
                         
-                        if (_onSeparate.exists(_touching[i].asset))
-                            _onSeparate[_touching[i].asset].dispatch();
+                        if (onSeparate.exists(_touching[i].asset))
+                            onSeparate[_touching[i].asset].dispatch();
                         
-                        trace('touching ${_touching[i].asset.name}');
+                        // trace('touching ${_touching[i].asset.name}');
                     }
                     _touching.splice(i, 1);
                 }
@@ -153,15 +164,20 @@ class Collider {
             }
             
             while (nowTouching.length > 0) {
+                var touching = nowTouching.shift();
+                
                 // --- START TOUCHING
-                if (nowTouching[0].asset != null) {
+                if (touching.asset != null) {
                     
-                    if (_onTouch.exists(nowTouching[0].asset))
-                        _onTouch[nowTouching[0].asset].dispatch();
+                    if (onTouch.exists(touching.asset))
+                        onTouch[touching.asset].dispatch();
                     
-                    trace('touching ${nowTouching[0].asset.name}');
+                    // if (touching.asset.target != null)
+                    //     trace('touching ${touching.asset.target.name}');
+                    // else
+                    //     trace('touching ${touching.asset.name}');
                 }
-                _touching.push(nowTouching.shift());
+                _touching.push(touching);
             }
         }
     }
@@ -250,14 +266,10 @@ class Collider {
     }
     
     public function isOverlapping(collider:Collider):Bool {
+        
         // --- BOX ONLY FOR NOW
-        return  (  (left <= collider.left   && right  >= collider.left  )
-                || (left <= collider.right  && right  >= collider.right )
-                )
-            &&  (  (top >= collider.top    && bottom <= collider.top   )
-                || (top >= collider.bottom && bottom <= collider.bottom)
-                )
-            ;
+        return left < collider.right  && right  > collider.left
+            && top  < collider.bottom && bottom > collider.top ;
     }
     
     inline function resolveOverlap(colliders:Array<Collider>):Void {
@@ -360,8 +372,8 @@ class Collider {
         _center = null;
         
         _touching   = null;
-        _onTouch    = null;
-        _onSeparate = null;
+        onTouch    = null;
+        onSeparate = null;
         
         onDestroy.dispatch();
     }

@@ -80,6 +80,7 @@ class HeroWrapper extends ScriptedWrapper {
         super.initCollider(boundsMc);
         
         collider.moves = true;
+        collider.trackTouches = true;
     }
     
     override public function updatePhysics(colliders:Array<Collider>):Void {

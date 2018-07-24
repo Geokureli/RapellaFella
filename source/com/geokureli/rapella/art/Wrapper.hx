@@ -1,14 +1,18 @@
 package com.geokureli.rapella.art;
 
-import com.geokureli.rapella.physics.Collider;
-import com.geokureli.rapella.utils.ChildMap;
-import com.geokureli.rapella.utils.SwfUtils;
 import flash.display.DisplayObject;
-import hx.debug.Assert;
+
 import openfl.display.DisplayObjectContainer;
 import openfl.display.MovieClip;
 import openfl.display.Sprite;
 import openfl.events.Event;
+
+import com.geokureli.rapella.art.scenes.Scene;
+import com.geokureli.rapella.physics.Collider;
+import com.geokureli.rapella.utils.ChildMap;
+import com.geokureli.rapella.utils.SwfUtils;
+
+import hx.debug.Assert;
 
 /**
  * @author George
@@ -133,7 +137,7 @@ class Wrapper extends Sprite
         _children = _childMapper.map(this, target);
     }
     
-    public function parseData(data:Dynamic):Void {
+    public function parseData(data:Dynamic, scene:Scene):Void {
         
         
     }
