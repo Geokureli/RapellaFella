@@ -25,14 +25,17 @@ class ScriptedWrapper extends Wrapper {
     public var use  (default, null):Event<Void->Void>;
     
     var _scriptId:String;
-    var _fieldMap:Map<String, Dynamic->ScriptedWrapper->Void>;
+    var _fieldMap:Map<String, Dynamic->String->Scene->Void>;
     var _actionMap:ActionMap;
     var _filters:Array<BitmapFilter>;
+    var _overGlow:BitmapFilter;
     
     public function new(target:DisplayObjectContainer) { super(target); }
     
     override function setDefaults() {
         super.setDefaults();
+        
+        _overGlow = UIColors.GLOW_CANT_USE;
         
         click = new Event<Void->Void>();
         parse = new Event<Void->Void>();
@@ -58,7 +61,7 @@ class ScriptedWrapper extends Wrapper {
 
     override public function parseData(data:Dynamic, scene:Scene):Void {
         
-        var target:ScriptedWrapper;
+        var target:String;
         var action;
         var splitIndex;
         for (field in Reflect.fields(data)) {
@@ -70,12 +73,11 @@ class ScriptedWrapper extends Wrapper {
             if (splitIndex != -1) {
                 
                 action = field.substr(0, splitIndex);
-                if (splitIndex + 1 < field.length)
-                    target = scene.findAsset(field.substr(splitIndex + 1));
+                target = field.substr(splitIndex + 1);
             }
             
             if (_fieldMap.exists(action))
-                _fieldMap[action](Reflect.field(data, field), target);
+                _fieldMap[action](Reflect.field(data, field), target, scene);
         }
         
         parse.dispatch();
@@ -116,7 +118,7 @@ class ScriptedWrapper extends Wrapper {
     //{ region                                              EVENTS
     // =================================================================================================================
     
-    function addListenerAction(event:Event<Void->Void>, action:Dynamic, target:ScriptedWrapper):Void {
+    function addListenerAction(event:Event<Void->Void>, action:Dynamic, params:String, scene:Scene):Void {
         
         event.add(ScriptInterpreter.run.bind(action));
     }
@@ -132,7 +134,20 @@ class ScriptedWrapper extends Wrapper {
         click.add(listener);
     }
     
-    function addTouchAction(action:Dynamic, target:ScriptedWrapper):Void {
+    static inline function getSceneTarget(params:String, scene:Scene):ScriptedWrapper {
+        
+        var ret = null;
+        if (params != null && params != "")
+            ret = scene.findAsset(params);
+        
+        return ret;
+    }
+    
+    function addTouchAction(action:Dynamic, params:String, scene:Scene):Void {
+        
+        if (params == null)
+            params = "hero";
+        var target = getSceneTarget(params, scene);
         
         //TODO: Set or check collider.trackTouches
         //Notes: be smart about the number the assets sensing touches (either in json or automated here)
@@ -142,21 +157,67 @@ class ScriptedWrapper extends Wrapper {
         target.collider.onTouch[this].add(ScriptInterpreter.run.bind(action));
     }
     
-    function addLeaveAction(action:Dynamic, target:ScriptedWrapper):Void {
+    function addLeaveAction(action:Dynamic, params:String, scene:Scene):Void {
+        
+        if (params == null)
+            params = "hero";
+        var target = getSceneTarget(params, scene);
         
         if (target.collider.onSeparate[this] == null)
             target.collider.onSeparate[this] = new Event<Void->Void>();
         target.collider.onSeparate[this].add(ScriptInterpreter.run.bind(action));
     }
     
-    function addClickAction(action:Dynamic, target:ScriptedWrapper):Void {
+    function addClickAction(action:Dynamic, params:String, scene:Scene):Void {
         
         addClickListener(ScriptInterpreter.run.bind(action));
     }
     
-    function addUseAction(action:Dynamic, target:ScriptedWrapper):Void {
+    function addUseAction(action:Dynamic, params:String, scene:Scene):Void {
+        
+        if (params == null)
+            params = "hero";
+        var target = getSceneTarget(params, scene);
         
         addClickListener(target.checkCanUse.bind(action, this));
+        
+        if (target.collider.onTouch[this] == null)
+            target.collider.onTouch[this] = new Event<Void->Void>();
+        target.collider.onTouch[this].add(onTouchUser);
+        
+        if (target.collider.onSeparate[this] == null)
+            target.collider.onSeparate[this] = new Event<Void->Void>();
+        target.collider.onSeparate[this].add(onLeaveUser);
+    }
+    
+    function onTouchUser():Void {
+        
+        var filterVisible = _filters.indexOf(_overGlow) != -1;
+        if (filterVisible)
+            _filters.remove(_overGlow);
+        
+        _overGlow = UIColors.GLOW_CAN_USE;
+        
+        if (filterVisible) {
+            
+            _filters.push(_overGlow);
+            target.filters = _filters;
+        }
+    }
+    
+    function onLeaveUser():Void {
+        
+        var filterVisible = _filters.indexOf(_overGlow) != -1;
+        if (filterVisible)
+            _filters.remove(_overGlow);
+        
+        _overGlow = UIColors.GLOW_CANT_USE;
+        
+        if (filterVisible) {
+            
+            _filters.push(_overGlow);
+            target.filters = _filters;
+        }
     }
     
     function checkCanUse(action:Dynamic, target:ScriptedWrapper):Void {
@@ -177,14 +238,14 @@ class ScriptedWrapper extends Wrapper {
         
         if (e.type == MouseEvent.MOUSE_OVER) {
             
-            if (_filters.indexOf(UIColors.GLOW_CAN_USE) == -1) {
+            if (_filters.indexOf(_overGlow) == -1) {
                 
-                _filters.push(UIColors.GLOW_CAN_USE);
+                _filters.push(_overGlow);
                 target.filters = _filters;
             }
-        } else if (_filters.indexOf(UIColors.GLOW_CAN_USE) != -1) {
+        } else if (_filters.indexOf(_overGlow) != -1) {
             
-            _filters.remove(UIColors.GLOW_CAN_USE);
+            _filters.remove(_overGlow);
             target.filters = _filters;
         }
     }

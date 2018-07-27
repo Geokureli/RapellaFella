@@ -63,7 +63,7 @@
             "wallSwitch": {
                 "init" : "vars.lightsOn = true",
                 "touch:hero":"game.log(touch Hero<->wallSwitch)",
-                "use:hero": [
+                "use": [
                     { "if"  : "vars.lightsOn"
                     , "then": [ "lightRay.gotoAndStop(off)", "vars.lightsOn = false" ]
                     , "else": [ "lightRay.gotoAndStop(on)" , "vars.lightsOn = true"  ]
