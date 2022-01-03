@@ -72,7 +72,7 @@ class Anim {
         if (end == null) {
             
             end = -1;
-            if(Std.is(start, String) && hasFrame(target, Std.string(start) + END))
+            if(start is String && hasFrame(target, Std.string(start) + END))
                 end = Std.string(start) + END;
         }
         
@@ -156,7 +156,7 @@ class Anim {
         if (!Assert.nonNull(target))
             return 0;
         
-        if (Std.is(frame, Int)) {
+        if (frame is Int) {
             
             if (frame == -1)
                 return target.totalFrames;
@@ -184,7 +184,7 @@ class Anim {
         if (!Assert.nonNull(target))
             return false;
         
-        if (Std.is(frame, Int))
+        if (frame is Int)
             return frame == -1 || frame <= target.totalFrames;
             
         if(Assert.is(frame, String)) {

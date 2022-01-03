@@ -75,7 +75,7 @@ class SwfUtils {
         while (path.length > 0) {
             
             child = parent.getChildByName(path.shift());
-            if (Std.is(child, DisplayObjectContainer))
+            if (child is DisplayObjectContainer)
                 parent = cast child;
         }
         
@@ -143,10 +143,10 @@ class SwfUtils {
         for (i in 0 ... target.numChildren) {
             
             child = cast(target.getChildAt(i), DisplayObject);
-            if (Std.is(child, InteractiveObject)) {
+            if (child is InteractiveObject) {
                 
                 cast(child, InteractiveObject).mouseEnabled = false;
-                if (Std.is(child, DisplayObjectContainer))
+                if (child is DisplayObjectContainer)
                     unsafe_mouseDisableAll(cast child);
             }
         }
@@ -155,7 +155,7 @@ class SwfUtils {
     inline static public function getHierarchyName(child:DisplayObject):String {
         
         var name = getChildName(child);
-        while (child.parent != null && child.parent != child.stage && !Std.is(child.parent, Game)) {
+        while (child.parent != null && child.parent != child.stage && !Std.isOfType(child.parent, Game)) {
             
             child = child.parent;
             name = getChildName(child) + "." + name;

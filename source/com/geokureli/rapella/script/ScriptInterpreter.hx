@@ -63,7 +63,7 @@ class ScriptInterpreter {
         if(callback == null)
             callback = emptyCallback;
         
-        if (Std.is(action, Array)){
+        if (action is Array){
             
             var array:Array<Dynamic> = cast action;
             
@@ -82,12 +82,12 @@ class ScriptInterpreter {
     
     static function handle(rawAction:Dynamic, callback:Void->Void):Void {
         
-        if (Std.is(rawAction, Array))
+        if (rawAction is Array)
         {
             run(rawAction, callback);
             return;
             
-        } else if (Std.is(rawAction, String)) {
+        } else if (rawAction is String) {
             
             if (_varSetToken.match(cast rawAction)){
                 

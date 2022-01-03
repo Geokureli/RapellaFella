@@ -43,7 +43,7 @@ class Debug {
             for (fieldName in Reflect.fields(data)) {
                 
                 value = Reflect.field(data, fieldName);
-                if (Std.is(Reflect.field(Debug, fieldName), Bool) && Std.is(value, String))
+                if (Reflect.field(Debug, fieldName) is Bool && value is String)
                     Reflect.setField(Debug, fieldName, value == "true");
                 else
                     Reflect.setField(Debug, fieldName, value);

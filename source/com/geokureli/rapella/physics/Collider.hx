@@ -64,7 +64,7 @@ class Collider {
         
         _touching = [];
         
-        if (wrapper != null && (boundsMc == null || boundsMc == wrapper) && Std.is(wrapper.target, Sprite))
+        if (wrapper != null && (boundsMc == null || boundsMc == wrapper) && wrapper.target is Sprite)
             boundsMc = cast wrapper.target;
 
         var parent:DisplayObjectContainer;
@@ -88,19 +88,19 @@ class Collider {
             _bounds.x + _bounds.width  / 2,
             _bounds.y + _bounds.height / 2
         );
-        
-        if (boundsMc.name == cast ColliderType.Cloud)
-            type = ColliderType.Cloud;
-        else if (boundsMc.name == cast ColliderType.Ramp)
-            type = ColliderType.Ramp;
-        else
-            type = ColliderType.Box;
+        type = switch (boundsMc.name)
+        {
+            case ColliderType.CLOUD | ColliderType.RAMP:
+                boundsMc.name;
+            case _:
+                BOX;
+        }
         
         if (wrapper == null || boundsMc.name == "bounds")
             boundsMc.visible = Debug.showBounds;
         
         solidSides = Direction.Any;
-        if (type == ColliderType.Cloud)
+        if (type == ColliderType.CLOUD)
             solidSides = Direction.Up;
     }
     
@@ -182,13 +182,13 @@ class Collider {
         }
     }
     
-    inline function halfAccel():Void
+    function halfAccel():Void
     {
         if (!isTouchingDir(acceleration.x > 0 ? Direction.Right : Direction.Left)) velocity.x += acceleration.x / 2;
         if (!isTouchingDir(acceleration.y > 0 ? Direction.Down  : Direction.Up  )) velocity.y += acceleration.y / 2;
     }
     
-    inline function resolveCollision(colliders:Array<Collider>, touched:Array<Collider>):Void {
+    function resolveCollision(colliders:Array<Collider>, touched:Array<Collider>):Void {
         
         var checkSides:Int = Direction.None;
         if      (velocity.x > 0)   checkSides |= Direction.Left ;

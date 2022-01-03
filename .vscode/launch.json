@@ -9,12 +9,16 @@
         , "preLaunchTask": "flash debug (build only)"
         , "program": "${workspaceRoot}/bin/flash/bin/RapellaFella.swf"
         }
-    ,   { "name"      : "Html5"
+    ,   { "name"      : "Html5 Debug"
         , "type"      : "chrome"
         , "request"   : "launch"
         , "url"       : "http://127.0.0.1:3000"
         , "sourceMaps": true
         , "webRoot"   : "${workspaceFolder}"
+        , "preLaunchTask": "html5 debug build"
+        }
+    ,   { "name": "Mac Debug", "type": "hxcpp", "request": "launch", "preLaunchTask": "mac debug"
+        , "program": "${workspaceRoot}/export/macos/bin/RapellaFella.app/Contents/MacOS/RapellaFella"
         }
     ]
 }

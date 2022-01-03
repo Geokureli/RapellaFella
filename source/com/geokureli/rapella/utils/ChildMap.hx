@@ -69,7 +69,7 @@ class ChildMap {
         var children:Array<DisplayObject> = new Array<DisplayObject>();
         for (path in _map.keys()) {
             
-            if (Std.is(_map[path], String))
+            if (_map[path] is String)
                 handler = { field:_map[path] };
             else 
                 handler = cast _map[path];
@@ -84,11 +84,11 @@ class ChildMap {
                 
                 Reflect.setField(target, handler.field, asset);
                 
-                if (Std.is(asset, IChildMappable) && !cast(asset, IChildMappable).isParent)
+                if (asset is IChildMappable && !cast(asset, IChildMappable).isParent)
                     children.push(cast(asset, IChildMappable).target);
-                else if (Std.is(asset, DisplayObject))
+                else if (asset is DisplayObject)
                     children.push(asset);
-                else if (Std.is(asset, Array)) {
+                else if (asset is Array) {
                     
                     for (i in 0 ... asset.length)
                         children.push(asset[i]);
@@ -151,7 +151,7 @@ class ChildMap {
                 
                 asset = applyParams(asset, handler);
                 
-                if (Std.is(target, IChildMappable)
+                if (target is IChildMappable
                 &&  errorLog.is(asset, DisplayObjectContainer, "Wrapped assets should be DisplayObjectContainers"))
                     asset = target.wrap(asset);
                 
@@ -198,7 +198,7 @@ class ChildMap {
         var value:Dynamic;
         for (path in _map.keys()) {
             
-            if (Std.is(_map[path], String))
+            if (_map[path] is String)
                 field = _map[path];
             else
                 field = _map[path].field;
@@ -214,10 +214,10 @@ class ChildMap {
     
     function destroyChild(value:Dynamic):Void {
         
-        if (Std.is(value, IChildMappable))
+        if (value is IChildMappable)
             value.unwrap();
         
-        if (Std.is(value, Array)) {
+        if (value is Array) {
             
             while (value.length > 0)
                 destroyChild(value.pop());

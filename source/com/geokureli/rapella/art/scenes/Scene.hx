@@ -239,12 +239,17 @@ class FrameData {
     var _frame:FrameLabel;
     var _data:Dynamic;
     var _isPlaying:Bool;
+    var _labels = new Map<String, ()->Void>();
     
     public function new(target:MovieClip, frame:FrameLabel, data:Dynamic) {
         
         _target = target;
         _frame = frame;
         _data = data;
+        
+        _labels["death"] = label_death;
+        _labels["choice"] = label_choice;
+        _labels["stop"] = label_stop;
         
         var i = _frame.name.indexOf(END);
         if (i > -1 && i == _frame.name.length - END.length) {
@@ -265,7 +270,8 @@ class FrameData {
             if (_frame.name.indexOf(token) == 0) {
                 
                 tokenFound = true;
-                Reflect.getProperty(this, "label_" + token)();
+                Assert.exists(_labels, token, 'Expecting label:$token');
+                _labels[token]();
                 break;
             }
         }

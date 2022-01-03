@@ -69,7 +69,7 @@ class AssetManager {
                 do {
                     if (library.exists('Scene$s', cast AssetType.MOVIE_CLIP))
                         _scenes['Scene$s'] = 'library$l:Scene$s';
-                    else if (s > min)
+                    else if (s >= min)
                         break;
                     
                     s++;

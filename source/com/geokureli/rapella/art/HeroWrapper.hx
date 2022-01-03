@@ -16,8 +16,8 @@ import openfl.geom.Point;
 class HeroWrapper extends ScriptedWrapper {
     
     // --- ZTHE CLOSEST YOU CAN GET TO A WALL5
-    static inline var JUMP_HEIGHT:Float = -50;
-    static inline var JUMP_APEX_TIME:Float = 7;// --- FRAMES
+    static inline var JUMP_HEIGHT:Float = -60;
+    static inline var JUMP_APEX_TIME:Float = 10;// --- FRAMES
     static inline var JUMP_VELOCITY:Float = 2 * JUMP_HEIGHT / JUMP_APEX_TIME;
     static inline var GRAVITY:Float = -2 * JUMP_HEIGHT / (JUMP_APEX_TIME * JUMP_APEX_TIME);
     

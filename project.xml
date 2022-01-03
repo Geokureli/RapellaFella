@@ -8,35 +8,34 @@
         package ="com.geokureli.rapella"
         version ="1.0.0"
         company ="GeoKureli"
-        path    ="bin/release"
+        path    ="export/release"
     />
-    <app path="bin" if="debug" />
+    <app path="export" if="debug" />
     
     <set name="SWF_VERSION" value="11.5"/>
     <!-- <set name="openfl-legacy" /> -->
     
     <classpath name="source" />
-    <classpath path="../lib/HxAssert/src" />
-    <classpath path="../lib/openfl" />
+    <classpath path="lib/HxAssert/src" />
     <!--<classpath path="../lib/HxBitmapAnim/src" />-->
     
-    <window width="960" height="540" fps="30" background="#000000" hardware="true" vsync="true" />
+    <window width="960" height="540" fps="30" background="#000000" hardware="true" vsync="true" resizable="false" />
     
     <haxelib name="openfl" />
     <haxelib name="swf" />
     <haxelib name="actuate" />
     
     <haxedef name="swf-parent-fps" />
-    <haxedef name="no-inline" if="debug" />
+    <!-- <haxedef name="no-inline" if="debug" /> -->
     <define name="defaultNonEmbed" if="windows || neko" />
-    <define name="embedAssets" unless="debug flash" />
+    <!-- <define name="embedAssets" unless="debug flash" /> -->
     
-    <library path="Assets/swfs/library0.swf" id="library0" type="swflite" preload="true" embed="true" if="embedAssets" />
-    <library path="Assets/swfs/library1.swf" id="library1" type="swflite" preload="true" embed="true" if="embedAssets" />
+    <library path="Assets/swfs/library0.swf" id="library0" preload="true" embed="true" if="embedAssets" />
+    <library path="Assets/swfs/library1.swf" id="library1" preload="true" embed="true" if="embedAssets" />
     <assets path="assets" exclude="openfl.svg|*.swf" embed="true" if="embedAssets" />
     
-    <library path="Assets/swfs/library0.swf" id="library0" type="swflite" preload="true" embed="false" unless="embedAssets"/>
-    <library path="Assets/swfs/library1.swf" id="library1" type="swflite" preload="true" embed="false" unless="embedAssets"/>
+    <library path="Assets/swfs/library0.swf" id="library0" preload="true" embed="false" unless="embedAssets"/>
+    <library path="Assets/swfs/library1.swf" id="library1" preload="true" embed="false" unless="embedAssets"/>
     <assets path="assets" exclude="openfl.svg|*.swf" embed="false" unless="embedAssets"/>
     
     <!--<library path="Assets/swfs/library0.swf" id="library0" type="swflite" preload="true" />-->
